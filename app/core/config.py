@@ -9,10 +9,26 @@ from pydantic import BaseSettings
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
-    # Database
-    mongodb_uri: str = "mongodb://localhost:27017"
+    # Database - Option 1: Full URI (recommended)
+    mongodb_uri: str = ""
+    
+    # Database - Option 2: Individual components (fallback)
+    mongodb_username: str = "mzahiddev404_db_user"
+    mongodb_password: str = ""
+    mongodb_cluster: str = "cluster0.sqcjidp.mongodb.net"
     database_name: str = "todo_app"
     
+    @property
+    def get_mongodb_uri(self) -> str:
+        """Get MongoDB URI from environment variables."""
+        if self.mongodb_uri:
+            return self.mongodb_uri
+        elif self.mongodb_password:
+            return f"mongodb+srv://{self.mongodb_username}:{self.mongodb_password}@{self.mongodb_cluster}/?retryWrites=true&w=majority&appName=Cluster0&ssl=true&tlsAllowInvalidCertificates=true"
+        else:
+            raise ValueError("Either MONGODB_URI or MONGODB_PASSWORD must be set")
+
+
     # JWT
     jwt_secret: str = "your-secret-key-change-in-production"
     jwt_algorithm: str = "HS256"
