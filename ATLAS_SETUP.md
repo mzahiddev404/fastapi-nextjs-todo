@@ -17,7 +17,7 @@ Once you have your connection string, replace the placeholder in `app/core/confi
 mongodb_uri: str = "mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority"
 
 # With your actual connection string:
-mongodb_uri: str = "mongodb+srv://yourusername:yourpassword@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority"
+mongodb_uri: str = "mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority"
 ```
 
 ## Test Connection

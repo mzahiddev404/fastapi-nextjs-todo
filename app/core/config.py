@@ -13,9 +13,9 @@ class Settings(BaseSettings):
     mongodb_uri: str = ""
     
     # Database - Option 2: Individual components (fallback)
-    mongodb_username: str = "mzahiddev404_db_user"
+    mongodb_username: str = ""
     mongodb_password: str = ""
-    mongodb_cluster: str = "cluster0.sqcjidp.mongodb.net"
+    mongodb_cluster: str = ""
     database_name: str = "todo_app"
     
     @property
@@ -30,7 +30,7 @@ class Settings(BaseSettings):
 
 
     # JWT
-    jwt_secret: str = "your-secret-key-change-in-production"
+    jwt_secret: str = ""
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     

@@ -9,14 +9,17 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Get password from environment
+# Get credentials from environment
+username = os.getenv("MONGODB_USERNAME")
 password = os.getenv("MONGODB_PASSWORD")
-if not password:
-    print("❌ MONGODB_PASSWORD not set in .env file")
+cluster = os.getenv("MONGODB_CLUSTER")
+
+if not all([username, password, cluster]):
+    print("❌ MONGODB_USERNAME, MONGODB_PASSWORD, and MONGODB_CLUSTER must be set in .env file")
     exit(1)
 
-# Construct URI with actual password
-uri = f"mongodb+srv://mzahiddev404_db_user:{password}@cluster0.sqcjidp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+# Construct URI with environment variables
+uri = f"mongodb+srv://{username}:{password}@{cluster}/?retryWrites=true&w=majority&appName=Cluster0"
 
 print("🔍 Testing MongoDB Atlas connection with PyMongo...")
 print(f"URI: {uri[:50]}... (truncated)")

@@ -20,13 +20,13 @@ async def test_atlas_connection():
         
         if not connection_string:
             # Fall back to individual components
-            username = os.getenv("MONGODB_USERNAME", "mzahiddev404_db_user")
+            username = os.getenv("MONGODB_USERNAME")
             password = os.getenv("MONGODB_PASSWORD")
-            cluster = os.getenv("MONGODB_CLUSTER", "cluster0.sqcjidp.mongodb.net")
+            cluster = os.getenv("MONGODB_CLUSTER")
             
-            if not password:
-                print("❌ Neither MONGODB_URI nor MONGODB_PASSWORD is set!")
-                print("Please set either MONGODB_URI or MONGODB_PASSWORD in your .env file")
+            if not all([username, password, cluster]):
+                print("❌ Neither MONGODB_URI nor all individual components (MONGODB_USERNAME, MONGODB_PASSWORD, MONGODB_CLUSTER) are set!")
+                print("Please set either MONGODB_URI or all individual components in your .env file")
                 return False
             
             # Construct connection string from components with SSL parameters
