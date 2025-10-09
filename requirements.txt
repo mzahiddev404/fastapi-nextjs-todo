@@ -4,8 +4,9 @@
 fastapi==0.104.1
 uvicorn==0.24.0
 motor==3.3.2  # Async MongoDB driver for FastAPI
-pydantic==2.5.0
+pydantic>=2.8.0
 python-multipart==0.0.6  # For form data handling
 python-jose[cryptography]==3.3.0  # For JWT tokens
 passlib[bcrypt]==1.7.4  # For password hashing
 python-dotenv==1.0.0  # For environment variables
+email-validator==2.1.0  # For email validation in Pydantic
