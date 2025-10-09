@@ -26,11 +26,20 @@ async def connect_to_mongo():
     # Get MongoDB URL from environment variables
     mongo_url = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
     
-    # Create MongoDB client
-    client = AsyncIOMotorClient(mongo_url)
-    database = client.todo_app  # Database name
-    
-    print("✅ Connected to MongoDB!")
+    # Create MongoDB client with SSL configuration for Python 3.13 compatibility
+    try:
+        client = AsyncIOMotorClient(mongo_url, tlsAllowInvalidCertificates=True)
+        database = client.todo_app  # Database name
+        
+        # Test the connection
+        await client.admin.command('ping')
+        print("✅ Connected to MongoDB!")
+    except Exception as e:
+        print(f"❌ MongoDB connection failed: {e}")
+        # Fallback to localhost for development
+        client = AsyncIOMotorClient("mongodb://localhost:27017")
+        database = client.todo_app
+        print("⚠️  Using localhost MongoDB (Atlas connection failed)")
 
 async def close_mongo_connection():
     """Close MongoDB connection on application shutdown"""

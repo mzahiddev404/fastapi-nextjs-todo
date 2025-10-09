@@ -19,12 +19,12 @@ router = APIRouter()
 # Token expiration time (30 minutes)
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-@router.post("/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/signup", response_model=Token, status_code=status.HTTP_201_CREATED)
 async def signup(
     user_data: UserCreate,
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
-    """Register a new user account"""
+    """Register a new user account and return JWT token"""
     
     user_crud = UserCRUD(db)
     
@@ -46,13 +46,13 @@ async def signup(
     hashed_password = get_password_hash(user_data.password)
     user = await user_crud.create(user_data, hashed_password)
     
-    return UserResponse(
-        id=user.id,
-        username=user.username,
-        email=user.email,
-        is_active=user.is_active,
-        created_at=user.created_at
+    # Create access token for immediate login
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.id}, expires_delta=access_token_expires
     )
+    
+    return Token(access_token=access_token, token_type="bearer")
 
 @router.post("/login", response_model=Token)
 async def login(

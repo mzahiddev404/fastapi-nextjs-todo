@@ -3,6 +3,7 @@
 # =============================================================================
 # Main FastAPI application with MongoDB integration
 # Handles authentication, tasks, and labels management
+# This is the entry point that sets up all routes and middleware
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,10 +24,10 @@ from core.db import connect_to_mongo, close_mongo_connection
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Handle application startup and shutdown events"""
-    # Startup: Connect to MongoDB
+    # Startup: Connect to MongoDB when the app starts
     await connect_to_mongo()
     yield
-    # Shutdown: Close MongoDB connection
+    # Shutdown: Clean up MongoDB connection when app stops
     await close_mongo_connection()
 
 # =============================================================================
@@ -41,10 +42,10 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS middleware for frontend communication
+# CORS middleware allows frontend to communicate with backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Next.js frontend
+    allow_origins=["http://localhost:3000"],  # Next.js frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
