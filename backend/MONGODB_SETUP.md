@@ -45,7 +45,7 @@
 
 2. **Use Atlas connection:**
    ```env
-   MONGODB_URL=mongodb+srv://username:password@cluster.mongodb.net/todo_app?retryWrites=true&w=majority
+   MONGODB_URL=mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority
    JWT_SECRET=your-super-secret-jwt-key-here
    ```
 
