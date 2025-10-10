@@ -26,20 +26,51 @@ async def connect_to_mongo():
     # Get MongoDB URL from environment variables
     mongo_url = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
     
-    # Create MongoDB client with SSL configuration for Python 3.13 compatibility
+    # Create MongoDB client with enhanced SSL configuration for Python 3.13 compatibility
     try:
-        client = AsyncIOMotorClient(mongo_url, tlsAllowInvalidCertificates=True)
+        # For Atlas connections, use enhanced SSL settings with Python 3.13 workaround
+        if "mongodb+srv://" in mongo_url:
+            # Python 3.13 workaround: Use more permissive SSL settings for Atlas
+            client = AsyncIOMotorClient(
+                mongo_url,
+                tls=True,
+                tlsAllowInvalidCertificates=True,   # Workaround for Python 3.13 SSL issues
+                tlsAllowInvalidHostnames=True,      # Workaround for Python 3.13 SSL issues
+                serverSelectionTimeoutMS=10000,     # 10 second timeout
+                connectTimeoutMS=20000,             # 20 second connection timeout
+                socketTimeoutMS=30000,              # 30 second socket timeout
+                retryWrites=True,                   # Enable retryable writes
+                retryReads=True,                    # Enable retryable reads
+                maxPoolSize=10,                     # Connection pool size
+                minPoolSize=1,                      # Minimum connections
+                maxIdleTimeMS=30000,                # 30 second idle timeout
+                waitQueueTimeoutMS=5000,            # 5 second wait timeout
+                heartbeatFrequencyMS=10000          # 10 second heartbeat
+            )
+        else:
+            # For local connections, use standard settings
+            client = AsyncIOMotorClient(mongo_url)
+        
         database = client.todo_app  # Database name
         
-        # Test the connection
+        # Test the connection with a more robust ping
         await client.admin.command('ping')
         print("✅ Connected to MongoDB!")
+        
     except Exception as e:
         print(f"❌ MongoDB connection failed: {e}")
-        # Fallback to localhost for development
-        client = AsyncIOMotorClient("mongodb://localhost:27017")
-        database = client.todo_app
-        print("⚠️  Using localhost MongoDB (Atlas connection failed)")
+        print("🔄 Attempting fallback to localhost...")
+        
+        try:
+            # Fallback to localhost for development
+            client = AsyncIOMotorClient("mongodb://localhost:27017")
+            database = client.todo_app
+            await client.admin.command('ping')
+            print("✅ Connected to localhost MongoDB!")
+        except Exception as fallback_error:
+            print(f"❌ Localhost MongoDB also failed: {fallback_error}")
+            print("⚠️  Please ensure MongoDB is running locally or fix Atlas connection")
+            raise fallback_error
 
 async def close_mongo_connection():
     """Close MongoDB connection on application shutdown"""
