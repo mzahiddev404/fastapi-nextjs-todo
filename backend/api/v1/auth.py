@@ -5,13 +5,11 @@
 # Handles user registration, login, and JWT token management
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from motor.motor_asyncio import AsyncIOMotorDatabase
 from datetime import timedelta
 from schemas.user import UserCreate, UserLogin, UserResponse, Token
 from models.user import User
 from crud.user import UserCRUD
 from core.security import get_password_hash, verify_password, create_access_token
-from core.db import get_database
 from api.deps import get_current_user
 
 router = APIRouter()
@@ -21,12 +19,11 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 @router.post("/signup", response_model=Token, status_code=status.HTTP_201_CREATED)
 async def signup(
-    user_data: UserCreate,
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    user_data: UserCreate
 ):
     """Register a new user account and return JWT token"""
     
-    user_crud = UserCRUD(db)
+    user_crud = UserCRUD()
     
     # Check if email is already taken
     if await user_crud.is_email_taken(user_data.email):
@@ -56,12 +53,11 @@ async def signup(
 
 @router.post("/login", response_model=Token)
 async def login(
-    user_credentials: UserLogin,
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    user_credentials: UserLogin
 ):
     """Login user and return JWT token"""
     
-    user_crud = UserCRUD(db)
+    user_crud = UserCRUD()
     
     # Get user by email
     user = await user_crud.get_by_email(user_credentials.email)

@@ -1,56 +1,34 @@
 # =============================================================================
-# USER MODEL
+# USER MODEL WITH BEANIE
 # =============================================================================
-# MongoDB document model for user data
-# Handles user creation, validation, and data conversion
+# Modern ODM for MongoDB with automatic validation and type safety
+# Much cleaner than manual ObjectId handling!
 
-from bson import ObjectId
-from typing import Optional
+from beanie import Document, Indexed
+from pydantic import Field, EmailStr
 from datetime import datetime
+from typing import Optional
 
-class User:
-    """User model for MongoDB documents"""
+class User(Document):
+    """User model with Beanie - automatic MongoDB integration"""
     
-    def __init__(
-        self,
-        username: str,
-        email: str,
-        hashed_password: str,
-        is_active: bool = True,
-        created_at: Optional[datetime] = None,
-        _id: Optional[ObjectId] = None
-    ):
-        self._id = _id or ObjectId()
-        self.username = username
-        self.email = email
-        self.hashed_password = hashed_password
-        self.is_active = is_active
-        self.created_at = created_at or datetime.utcnow()
+    # Indexed fields for better performance and uniqueness
+    email: Indexed(EmailStr, unique=True)
+    username: Indexed(str, unique=True)
     
-    def to_dict(self) -> dict:
-        """Convert user to dictionary for MongoDB storage"""
-        return {
-            "_id": self._id,
-            "username": self.username,
-            "email": self.email,
-            "hashed_password": self.hashed_password,
-            "is_active": self.is_active,
-            "created_at": self.created_at
-        }
+    # Regular fields with validation
+    hashed_password: str
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
     
-    @classmethod
-    def from_dict(cls, data: dict) -> "User":
-        """Create user instance from MongoDB document"""
-        return cls(
-            _id=data["_id"],
-            username=data["username"],
-            email=data["email"],
-            hashed_password=data["hashed_password"],
-            is_active=data.get("is_active", True),
-            created_at=data.get("created_at", datetime.utcnow())
-        )
+    class Settings:
+        name = "users"  # Collection name
+        indexes = [
+            "email",
+            "username", 
+            "created_at"
+        ]
     
-    @property
-    def id(self) -> str:
-        """Get user ID as string"""
-        return str(self._id)
+    def __str__(self) -> str:
+        return f"User(username={self.username}, email={self.email})"

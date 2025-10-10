@@ -5,12 +5,10 @@
 # Handles label CRUD operations and task associations
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from motor.motor_asyncio import AsyncIOMotorDatabase
 from typing import List
 from schemas.label import LabelCreate, LabelUpdate, LabelResponse, LabelWithTaskCount
 from models.user import User
 from crud.label import LabelCRUD
-from core.db import get_database
 from api.deps import get_current_user
 
 router = APIRouter()
@@ -19,11 +17,10 @@ router = APIRouter()
 async def create_label(
     label_data: LabelCreate,
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """Create a new label for the current user"""
     
-    label_crud = LabelCRUD(db)
+    label_crud = LabelCRUD()
     
     # Check if label name is already taken by this user
     if await label_crud.is_name_taken(label_data.name, current_user.id):
@@ -45,11 +42,10 @@ async def create_label(
 @router.get("/", response_model=List[LabelWithTaskCount])
 async def get_labels(
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """Get all labels for the current user with task counts"""
     
-    label_crud = LabelCRUD(db)
+    label_crud = LabelCRUD()
     labels = await label_crud.get_with_task_count(current_user.id)
     
     return [
@@ -68,11 +64,10 @@ async def get_labels(
 async def get_label(
     label_id: str,
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """Get a specific label by ID"""
     
-    label_crud = LabelCRUD(db)
+    label_crud = LabelCRUD()
     label = await label_crud.get_by_id(label_id)
     
     if not label:
@@ -100,11 +95,10 @@ async def update_label(
     label_id: str,
     label_data: LabelUpdate,
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """Update a label"""
     
-    label_crud = LabelCRUD(db)
+    label_crud = LabelCRUD()
     
     # Check if label exists and belongs to user
     existing_label = await label_crud.get_by_id(label_id)
@@ -148,11 +142,10 @@ async def update_label(
 async def delete_label(
     label_id: str,
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """Delete a label"""
     
-    label_crud = LabelCRUD(db)
+    label_crud = LabelCRUD()
     
     # Check if label exists and belongs to user
     existing_label = await label_crud.get_by_id(label_id)

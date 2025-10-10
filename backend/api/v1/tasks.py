@@ -5,13 +5,11 @@
 # Handles task CRUD operations and status management
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from motor.motor_asyncio import AsyncIOMotorDatabase
 from typing import Optional, List
 from schemas.task import TaskCreate, TaskUpdate, TaskResponse, TaskStats
 from models.task import Task, TaskStatus
 from models.user import User
 from crud.task import TaskCRUD
-from core.db import get_database
 from api.deps import get_current_user
 
 router = APIRouter()
@@ -19,12 +17,11 @@ router = APIRouter()
 @router.post("/", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
 async def create_task(
     task_data: TaskCreate,
-    current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    current_user: User = Depends(get_current_user)
 ):
     """Create a new task for the current user"""
     
-    task_crud = TaskCRUD(db)
+    task_crud = TaskCRUD()
     task = await task_crud.create(task_data, current_user.id)
     
     return TaskResponse(
@@ -43,11 +40,10 @@ async def create_task(
 async def get_tasks(
     status_filter: Optional[str] = Query(None, alias="status"),
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """Get all tasks for the current user, optionally filtered by status"""
     
-    task_crud = TaskCRUD(db)
+    task_crud = TaskCRUD()
     tasks = await task_crud.get_by_user(current_user.id, status_filter)
     
     return [
@@ -68,11 +64,10 @@ async def get_tasks(
 @router.get("/stats", response_model=TaskStats)
 async def get_task_stats(
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """Get task statistics for the current user"""
     
-    task_crud = TaskCRUD(db)
+    task_crud = TaskCRUD()
     stats = await task_crud.get_stats(current_user.id)
     
     return TaskStats(**stats)
@@ -81,11 +76,10 @@ async def get_task_stats(
 async def get_task(
     task_id: str,
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """Get a specific task by ID"""
     
-    task_crud = TaskCRUD(db)
+    task_crud = TaskCRUD()
     task = await task_crud.get_by_id(task_id)
     
     if not task:
@@ -117,11 +111,10 @@ async def update_task(
     task_id: str,
     task_data: TaskUpdate,
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """Update a task"""
     
-    task_crud = TaskCRUD(db)
+    task_crud = TaskCRUD()
     
     # Check if task exists and belongs to user
     existing_task = await task_crud.get_by_id(task_id)
@@ -162,11 +155,10 @@ async def update_task_status(
     task_id: str,
     status: TaskStatus,
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """Update task status"""
     
-    task_crud = TaskCRUD(db)
+    task_crud = TaskCRUD()
     
     # Check if task exists and belongs to user
     existing_task = await task_crud.get_by_id(task_id)
@@ -206,11 +198,10 @@ async def update_task_status(
 async def delete_task(
     task_id: str,
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """Delete a task"""
     
-    task_crud = TaskCRUD(db)
+    task_crud = TaskCRUD()
     
     # Check if task exists and belongs to user
     existing_task = await task_crud.get_by_id(task_id)

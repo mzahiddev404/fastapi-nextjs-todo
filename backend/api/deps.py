@@ -6,19 +6,16 @@
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from motor.motor_asyncio import AsyncIOMotorDatabase
 from typing import Optional
 from models.user import User
 from crud.user import UserCRUD
 from core.security import verify_token
-from core.db import get_database
 
 # HTTP Bearer token scheme
 security = HTTPBearer()
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ) -> User:
     """Get current authenticated user from JWT token"""
     
@@ -35,7 +32,7 @@ async def get_current_user(
         )
     
     # Get user from database
-    user_crud = UserCRUD(db)
+    user_crud = UserCRUD()
     user = await user_crud.get_by_id(user_id)
     if user is None:
         raise HTTPException(
@@ -60,8 +57,7 @@ async def get_current_active_user(
     return current_user
 
 async def get_optional_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
 ) -> Optional[User]:
     """Get current user if token is provided, otherwise return None"""
     
@@ -74,7 +70,7 @@ async def get_optional_current_user(
         if user_id is None:
             return None
         
-        user_crud = UserCRUD(db)
+        user_crud = UserCRUD()
         user = await user_crud.get_by_id(user_id)
         return user if user and user.is_active else None
     

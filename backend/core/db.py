@@ -1,12 +1,18 @@
 # =============================================================================
-# DATABASE CONNECTION MANAGEMENT
+# DATABASE CONNECTION WITH BEANIE
 # =============================================================================
-# Handles MongoDB connection using PyMongo
-# Provides async database access for the application
+# Modern ODM for MongoDB with automatic model management
+# Much cleaner than manual collection handling!
 
+from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 from typing import AsyncGenerator
 import os
+
+# Import your Beanie models
+from models.user import User
+from models.task import Task
+from models.label import Label
 
 # Global database client and database instance
 client: AsyncIOMotorClient = None
@@ -20,7 +26,7 @@ async def get_database() -> AsyncGenerator:
     yield database
 
 async def connect_to_mongo():
-    """Establish connection to MongoDB"""
+    """Initialize Beanie with MongoDB"""
     global client, database
     
     # Get MongoDB URL from environment variables
@@ -53,9 +59,15 @@ async def connect_to_mongo():
         
         database = client.todo_app  # Database name
         
-        # Test the connection with a more robust ping
+        # Initialize Beanie with your models - this is the magic! ✨
+        await init_beanie(
+            database=database,
+            document_models=[User, Task, Label]
+        )
+        
+        # Test the connection
         await client.admin.command('ping')
-        print("✅ Connected to MongoDB!")
+        print("✅ Beanie initialized successfully!")
         
     except Exception as e:
         print(f"❌ MongoDB connection failed: {e}")
@@ -65,8 +77,15 @@ async def connect_to_mongo():
             # Fallback to localhost for development
             client = AsyncIOMotorClient("mongodb://localhost:27017")
             database = client.todo_app
+            
+            # Initialize Beanie with localhost
+            await init_beanie(
+                database=database,
+                document_models=[User, Task, Label]
+            )
+            
             await client.admin.command('ping')
-            print("✅ Connected to localhost MongoDB!")
+            print("✅ Beanie initialized with localhost MongoDB!")
         except Exception as fallback_error:
             print(f"❌ Localhost MongoDB also failed: {fallback_error}")
             print("⚠️  Please ensure MongoDB is running locally or fix Atlas connection")

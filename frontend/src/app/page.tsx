@@ -23,6 +23,15 @@ export default function Home() {
     }
   }, [authLoading, isAuthenticated, router]);
 
+  // Don't render anything while redirecting
+  if (!authLoading && !isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" text="Redirecting to login..." />
+      </div>
+    );
+  }
+
   const isLoading = authLoading || tasksLoading;
   const error = authError || tasksError;
 
@@ -79,7 +88,7 @@ export default function Home() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="max-w-md w-full">
           <Alert variant="error" className="mb-4">
-            {error}
+            {error instanceof Error ? error.message : String(error)}
           </Alert>
           <Button
             onClick={() => window.location.reload()}

@@ -1,52 +1,33 @@
 # =============================================================================
-# LABEL MODEL
+# LABEL MODEL WITH BEANIE
 # =============================================================================
-# MongoDB document model for label data
-# Handles label creation and color management
+# Modern ODM for MongoDB with automatic validation and type safety
+# Much cleaner than manual ObjectId handling!
 
-from bson import ObjectId
+from beanie import Document, Indexed, PydanticObjectId
+from pydantic import Field
 from typing import Optional
 from datetime import datetime
 
-class Label:
-    """Label model for MongoDB documents"""
+class Label(Document):
+    """Label model with Beanie - automatic MongoDB integration"""
     
-    def __init__(
-        self,
-        name: str,
-        color: str = "#3B82F6",  # Default blue color
-        user_id: str = None,
-        created_at: Optional[datetime] = None,
-        _id: Optional[ObjectId] = None
-    ):
-        self._id = _id or ObjectId()
-        self.name = name
-        self.color = color
-        self.user_id = user_id
-        self.created_at = created_at or datetime.utcnow()
+    # Indexed fields for better performance
+    user_id: Indexed(PydanticObjectId)
+    name: str
     
-    def to_dict(self) -> dict:
-        """Convert label to dictionary for MongoDB storage"""
-        return {
-            "_id": self._id,
-            "name": self.name,
-            "color": self.color,
-            "user_id": self.user_id,
-            "created_at": self.created_at
-        }
+    # Regular fields with validation
+    color: str = "#3B82F6"  # Default blue color
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
     
-    @classmethod
-    def from_dict(cls, data: dict) -> "Label":
-        """Create label instance from MongoDB document"""
-        return cls(
-            _id=data["_id"],
-            name=data["name"],
-            color=data.get("color", "#3B82F6"),
-            user_id=data["user_id"],
-            created_at=data.get("created_at", datetime.utcnow())
-        )
+    class Settings:
+        name = "labels"  # Collection name
+        indexes = [
+            "user_id",
+            "name",
+            "created_at"
+        ]
     
-    @property
-    def id(self) -> str:
-        """Get label ID as string"""
-        return str(self._id)
+    def __str__(self) -> str:
+        return f"Label(name={self.name}, color={self.color})"
