@@ -1,103 +1,276 @@
-import Image from "next/image";
+"use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button, Card, CardHeader, CardContent, LoadingSpinner, Alert } from "@/components/ui";
+import { useAuth } from "@/hooks/useAuth";
+import { useTasks } from "@/hooks/useTasks";
+import { TaskForm } from "@/components/TaskForm";
+import { Task } from "@/types";
+
+// Main dashboard page - protected route that shows user info and task list
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const router = useRouter();
+  const { user, isLoading: authLoading, error: authError, isAuthenticated, logout } = useAuth();
+  const { tasks, isLoading: tasksLoading, error: tasksError, updateTaskStatus, deleteTask } = useTasks();
+  const [showTaskForm, setShowTaskForm] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/auth/login");
+    }
+  }, [authLoading, isAuthenticated, router]);
+
+  const isLoading = authLoading || tasksLoading;
+  const error = authError || tasksError;
+
+  // Handle user logout
+  const handleLogout = () => {
+    logout();
+    router.push("/auth/login");
+  };
+
+  // Handle task actions
+  const handleCreateTask = () => {
+    setEditingTask(null);
+    setShowTaskForm(true);
+  };
+
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setShowTaskForm(true);
+  };
+
+  const handleToggleTaskStatus = async (task: Task) => {
+    try {
+      await updateTaskStatus(task.id, task.status === "completed" ? "pending" : "completed");
+    } catch (error) {
+      console.error("Failed to update task status:", error);
+    }
+  };
+
+  const handleDeleteTask = async (task: Task) => {
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      try {
+        await deleteTask(task.id);
+      } catch (error) {
+        console.error("Failed to delete task:", error);
+      }
+    }
+  };
+
+  const handleTaskFormClose = () => {
+    setShowTaskForm(false);
+    setEditingTask(null);
+  };
+
+  if (isLoading) {
+  return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" text="Loading your dashboard..." />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <Alert variant="error" className="mb-4">
+            {error}
+          </Alert>
+          <Button
+            onClick={() => window.location.reload()}
+            className="w-full"
+            size="lg"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header with user info and logout */}
+      <header id="navigation" className="bg-white shadow" role="banner">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">TODO Dashboard</h1>
+              <p className="text-gray-600">
+                Welcome back, {user?.name || user?.email || "User"}!
+              </p>
+            </div>
+            <Button
+              onClick={handleLogout}
+              variant="danger"
+              size="sm"
+              aria-label="Logout from your account"
+            >
+              Logout
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main content area */}
+      <main id="main-content" className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8" role="main">
+        <div className="px-4 py-6 sm:px-0">
+          {/* Task List */}
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  Your Tasks ({tasks.length})
+                </h3>
+                <Button 
+                  size="sm" 
+                  onClick={handleCreateTask}
+                  aria-label="Create a new task"
+                >
+                  Add Task
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {tasks.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="text-gray-500 mb-4">No tasks yet</div>
+                  <p className="text-sm text-gray-400">Create your first task to get started!</p>
+                </div>
+              ) : (
+                <div className="space-y-3" role="list" aria-label="Task list">
+                  {tasks.map((task) => (
+                    <Card
+                      key={task.id}
+                      className={`${
+                        task.status === 'completed' 
+                          ? 'bg-gray-50 border-gray-200' 
+                          : 'bg-white border-gray-300'
+                      }`}
+                      padding="sm"
+                      role="listitem"
+                      aria-label={`Task: ${task.title}, Status: ${task.status}, Priority: ${task.priority}`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className={`font-medium ${
+                            task.status === 'completed' 
+                              ? 'line-through text-gray-500' 
+                              : 'text-gray-900'
+                          }`}>
+                            {task.title}
+                          </h4>
+                          {task.description && (
+                            <p className="text-sm text-gray-600 mt-1">{task.description}</p>
+                          )}
+                          <div className="flex items-center space-x-4 mt-2">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              task.priority === 'high' 
+                                ? 'bg-red-100 text-red-800'
+                                : task.priority === 'medium'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-green-100 text-green-800'
+                            }`}>
+                              {task.priority}
+                            </span>
+                            {task.due_date && (
+                              <span className="text-xs text-gray-500">
+                                Due: {new Date(task.due_date).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2" role="group" aria-label={`Actions for task: ${task.title}`}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleToggleTaskStatus(task)}
+                            aria-label={`${task.status === "completed" ? "Mark as pending" : "Mark as complete"} task: ${task.title}`}
+                          >
+                            {task.status === "completed" ? "Mark Pending" : "Mark Complete"}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditTask(task)}
+                            aria-label={`Edit task: ${task.title}`}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => handleDeleteTask(task)}
+                            aria-label={`Delete task: ${task.title}`}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* User info card */}
+          <Card className="mt-6">
+            <CardHeader>
+              <h3 className="text-lg leading-6 font-medium text-gray-900">
+                Account Information
+              </h3>
+            </CardHeader>
+            <CardContent>
+              <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Name</dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {user?.name || "Not provided"}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Email</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{user?.email}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">User ID</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{user?.id}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Status</dt>
+                  <dd className="mt-1 text-sm text-green-600">Authenticated</dd>
+                </div>
+              </dl>
+            </CardContent>
+          </Card>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+      {/* Task Form Modal */}
+      {showTaskForm && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="task-form-title"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <div className="w-full max-w-2xl">
+            <TaskForm
+              task={editingTask || undefined}
+              onClose={handleTaskFormClose}
+              onSuccess={() => {
+                // Task will be automatically refreshed by SWR
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
