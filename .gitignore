@@ -7,6 +7,13 @@
 
 # Internal evaluation and documentation files
 Codebase Design Evaluation.txt
+*EVALUATION*.md
+*CHECKLIST*.md
+*SUMMARY*.md
+*SETUP*.md
+*_CLI_README.md
+SECURITY_*.md
+PROJECT_*.md
 
 # Security: Prevent sensitive data from being committed
 *secret*
