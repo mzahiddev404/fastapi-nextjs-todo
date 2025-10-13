@@ -13,7 +13,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, startDemo } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +26,21 @@ export default function LoginPage() {
     } catch (err) {
       console.error("Login error:", err);
       setError(err instanceof Error ? err.message : "Login failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDemo = async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      await startDemo();
+      router.push("/");
+    } catch (err) {
+      console.error("Demo error:", err);
+      setError(err instanceof Error ? err.message : "Demo failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -103,7 +118,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div>
+            <div className="space-y-3">
               <button
                 type="submit"
                 disabled={isLoading}
@@ -119,6 +134,28 @@ export default function LoginPage() {
                   </div>
                 ) : (
                   "Sign in"
+                )}
+              </button>
+              
+              <button
+                type="button"
+                onClick={handleDemo}
+                disabled={isLoading}
+                className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <div className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Starting demo...
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    <span className="mr-2">🎯</span>
+                    Try Demo
+                  </div>
                 )}
               </button>
             </div>

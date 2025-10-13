@@ -1,6 +1,6 @@
 # models/__init__.py
-from .user import User
-from .task import Task, TaskStatus
-from .label import Label
+from .user import UserModel
+from .task import TaskModel, TaskStatus, Priority
+from .label import LabelModel
 
-__all__ = ["User", "Task", "TaskStatus", "Label"]
+__all__ = ["UserModel", "TaskModel", "TaskStatus", "Priority", "LabelModel"]

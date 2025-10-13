@@ -8,15 +8,16 @@ export interface User {
   name?: string;
   created_at?: string;
   updated_at?: string;
+  is_demo?: boolean;
 }
 
 export interface Task {
   id: string;
   title: string;
   description?: string;
-  status: 'pending' | 'completed';
+  status: 'incomplete' | 'complete';
   priority: 'low' | 'medium' | 'high';
-  due_date?: string;
+  due_date: string;  // Required field
   label_ids?: string[];
   user_id: string;
   created_at: string;
@@ -47,14 +48,14 @@ export interface TaskCreate {
   title: string;
   description?: string;
   priority: 'low' | 'medium' | 'high';
-  due_date?: string;
+  due_date: string;  // Required field
   label_ids?: string[];
 }
 
 export interface TaskUpdate {
   title?: string;
   description?: string;
-  status?: 'pending' | 'completed';
+  status?: 'incomplete' | 'complete';
   priority?: 'low' | 'medium' | 'high';
   due_date?: string;
   label_ids?: string[];
@@ -83,9 +84,8 @@ export interface UserLogin {
 
 export interface TaskStats {
   total: number;
-  pending: number;
-  completed: number;
-  overdue: number;
+  incomplete: number;
+  complete: number;
 }
 
 export interface ApiResponse<T> {

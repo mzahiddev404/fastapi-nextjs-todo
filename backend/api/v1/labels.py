@@ -1,74 +1,97 @@
-# =============================================================================
-# LABEL API ROUTES
-# =============================================================================
-# FastAPI routes for label management
-# Handles label CRUD operations and task associations
-
-from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
-from schemas.label import LabelCreate, LabelUpdate, LabelResponse, LabelWithTaskCount
-from models.user import User
-from crud.label import LabelCRUD
-from api.deps import get_current_user
+from datetime import datetime
+from fastapi import APIRouter, Depends, HTTPException, status, Query
+from bson import ObjectId
 
-router = APIRouter()
+from core.database import get_database
+from core.security import get_current_active_user
+from schemas.label import LabelCreate, LabelUpdate, LabelResponse, LabelListResponse
 
-@router.post("/", response_model=LabelResponse, status_code=status.HTTP_201_CREATED)
+router = APIRouter(prefix="/labels", tags=["Labels"])
+
+
+@router.post("", response_model=LabelResponse, status_code=status.HTTP_201_CREATED)
 async def create_label(
     label_data: LabelCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_active_user)
 ):
-    """Create a new label for the current user"""
+    """Create a new label"""
+    db = await get_database()
     
-    label_crud = LabelCRUD()
+    # Check if label with same name already exists for this user
+    existing_label = await db.labels.find_one({
+        "user_id": current_user["_id"],
+        "name": label_data.name
+    })
     
-    # Check if label name is already taken by this user
-    if await label_crud.is_name_taken(label_data.name, current_user.id):
+    if existing_label:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Label name already exists"
+            detail=f"Label with name '{label_data.name}' already exists"
         )
     
-    label = await label_crud.create(label_data, current_user.id)
+    # Create label document
+    label_dict = {
+        "user_id": current_user["_id"],
+        "name": label_data.name,
+        "color": label_data.color,
+        "created_at": datetime.utcnow()
+    }
     
-    return LabelResponse(
-        id=label.id,
-        name=label.name,
-        color=label.color,
-        user_id=label.user_id,
-        created_at=label.created_at
-    )
+    result = await db.labels.insert_one(label_dict)
+    created_label = await db.labels.find_one({"_id": result.inserted_id})
+    
+    # Convert ObjectIds to strings for response
+    created_label["_id"] = str(created_label["_id"])
+    created_label["user_id"] = str(created_label["user_id"])
+    
+    return created_label
 
-@router.get("/", response_model=List[LabelWithTaskCount])
+
+@router.get("", response_model=LabelListResponse)
 async def get_labels(
-    current_user: User = Depends(get_current_user),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=100),
+    current_user: dict = Depends(get_current_active_user)
 ):
-    """Get all labels for the current user with task counts"""
+    """Get all labels for current user"""
+    db = await get_database()
     
-    label_crud = LabelCRUD()
-    labels = await label_crud.get_with_task_count(current_user.id)
+    # Build query
+    query = {"user_id": current_user["_id"]}
     
-    return [
-        LabelWithTaskCount(
-            id=label["id"],
-            name=label["name"],
-            color=label["color"],
-            user_id=label["user_id"],
-            created_at=label["created_at"],
-            task_count=label["task_count"]
-        )
-        for label in labels
-    ]
+    # Get labels with pagination
+    cursor = db.labels.find(query).sort("created_at", -1).skip(skip).limit(limit)
+    labels = await cursor.to_list(length=limit)
+    
+    # Get total count
+    total = await db.labels.count_documents(query)
+    
+    # Convert ObjectIds to strings
+    for label in labels:
+        label["_id"] = str(label["_id"])
+        label["user_id"] = str(label["user_id"])
+    
+    return {"labels": labels, "total": total}
+
 
 @router.get("/{label_id}", response_model=LabelResponse)
 async def get_label(
     label_id: str,
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_active_user)
 ):
     """Get a specific label by ID"""
+    if not ObjectId.is_valid(label_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid label ID"
+        )
     
-    label_crud = LabelCRUD()
-    label = await label_crud.get_by_id(label_id)
+    db = await get_database()
+    label = await db.labels.find_one({
+        "_id": ObjectId(label_id),
+        "user_id": current_user["_id"]
+    })
     
     if not label:
         raise HTTPException(
@@ -76,97 +99,112 @@ async def get_label(
             detail="Label not found"
         )
     
-    if label.user_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to access this label"
-        )
+    # Convert ObjectIds to strings
+    label["_id"] = str(label["_id"])
+    label["user_id"] = str(label["user_id"])
     
-    return LabelResponse(
-        id=label.id,
-        name=label.name,
-        color=label.color,
-        user_id=label.user_id,
-        created_at=label.created_at
-    )
+    return label
+
 
 @router.put("/{label_id}", response_model=LabelResponse)
 async def update_label(
     label_id: str,
     label_data: LabelUpdate,
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_active_user)
 ):
     """Update a label"""
+    if not ObjectId.is_valid(label_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid label ID"
+        )
     
-    label_crud = LabelCRUD()
+    db = await get_database()
     
     # Check if label exists and belongs to user
-    existing_label = await label_crud.get_by_id(label_id)
+    existing_label = await db.labels.find_one({
+        "_id": ObjectId(label_id),
+        "user_id": current_user["_id"]
+    })
+    
     if not existing_label:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Label not found"
         )
     
-    if existing_label.user_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to update this label"
-        )
+    # Build update document
+    update_data = {}
     
-    # Check if new name is taken (if name is being updated)
-    if label_data.name and label_data.name != existing_label.name:
-        if await label_crud.is_name_taken(label_data.name, current_user.id, label_id):
+    if label_data.name is not None:
+        # Check if new name conflicts with existing label
+        name_conflict = await db.labels.find_one({
+            "user_id": current_user["_id"],
+            "name": label_data.name,
+            "_id": {"$ne": ObjectId(label_id)}
+        })
+        if name_conflict:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Label name already exists"
+                detail=f"Label with name '{label_data.name}' already exists"
             )
+        update_data["name"] = label_data.name
     
-    # Update label
-    label = await label_crud.update(label_id, label_data)
-    if not label:
+    if label_data.color is not None:
+        update_data["color"] = label_data.color
+    
+    if not update_data:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Failed to update label"
+            detail="No fields to update"
         )
     
-    return LabelResponse(
-        id=label.id,
-        name=label.name,
-        color=label.color,
-        user_id=label.user_id,
-        created_at=label.created_at
+    # Update label
+    await db.labels.update_one(
+        {"_id": ObjectId(label_id)},
+        {"$set": update_data}
     )
+    
+    # Get updated label
+    updated_label = await db.labels.find_one({"_id": ObjectId(label_id)})
+    
+    # Convert ObjectIds to strings
+    updated_label["_id"] = str(updated_label["_id"])
+    updated_label["user_id"] = str(updated_label["user_id"])
+    
+    return updated_label
 
-@router.delete("/{label_id}")
+
+@router.delete("/{label_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_label(
     label_id: str,
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_active_user)
 ):
     """Delete a label"""
+    if not ObjectId.is_valid(label_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid label ID"
+        )
     
-    label_crud = LabelCRUD()
+    db = await get_database()
     
     # Check if label exists and belongs to user
-    existing_label = await label_crud.get_by_id(label_id)
-    if not existing_label:
+    result = await db.labels.delete_one({
+        "_id": ObjectId(label_id),
+        "user_id": current_user["_id"]
+    })
+    
+    if result.deleted_count == 0:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Label not found"
         )
     
-    if existing_label.user_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to delete this label"
-        )
+    # Remove this label from all tasks
+    await db.tasks.update_many(
+        {"user_id": current_user["_id"]},
+        {"$pull": {"labels": ObjectId(label_id)}}
+    )
     
-    # Delete label
-    success = await label_crud.delete(label_id)
-    if not success:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Failed to delete label"
-        )
-    
-    return {"message": "Label deleted successfully"}
+    return None

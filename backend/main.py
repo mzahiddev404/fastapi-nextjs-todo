@@ -30,7 +30,7 @@ from api.v1.admin import router as admin_router  # TEMPORARY: For database clean
 from api.v1.health import router as health_router
 
 # Import database connection
-from core.db import connect_to_mongo, close_mongo_connection
+from core.database import connect_to_mongo, close_mongo_connection
 
 # =============================================================================
 # APPLICATION LIFECYCLE
@@ -137,13 +137,13 @@ app.add_middleware(
 # =============================================================================
 
 # Authentication routes
-app.include_router(auth_router, prefix="/api/v1/auth", tags=["Authentication"])
+app.include_router(auth_router, prefix="/api/v1", tags=["Authentication"])
 
 # Task management routes
-app.include_router(tasks_router, prefix="/api/v1/tasks", tags=["Tasks"])
+app.include_router(tasks_router, prefix="/api/v1", tags=["Tasks"])
 
 # Label management routes
-app.include_router(labels_router, prefix="/api/v1/labels", tags=["Labels"])
+app.include_router(labels_router, prefix="/api/v1", tags=["Labels"])
 
 # Admin routes (TEMPORARY - for database cleanup)
 app.include_router(admin_router, prefix="/api/v1/admin", tags=["Admin"])

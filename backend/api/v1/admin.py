@@ -4,9 +4,7 @@
 # WARNING: Remove this file after cleaning the database!
 
 from fastapi import APIRouter, HTTPException
-from models.user import User
-from models.task import Task
-from models.label import Label
+from core.database import get_database
 
 router = APIRouter()
 
@@ -17,10 +15,12 @@ async def clear_all_data():
     This is a temporary endpoint to fix UUID → ObjectId migration
     """
     try:
+        db = await get_database()
+        
         # Delete all documents
-        user_result = await User.delete_all()
-        task_result = await Task.delete_all()
-        label_result = await Label.delete_all()
+        user_result = await db.users.delete_many({})
+        task_result = await db.tasks.delete_many({})
+        label_result = await db.labels.delete_many({})
         
         return {
             "message": "All data cleared successfully",

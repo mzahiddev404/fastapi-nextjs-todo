@@ -40,7 +40,7 @@ export function useAuth() {
   const login = async (email: string, password: string) => {
     try {
       const response = await api.post("/api/v1/auth/login", { email, password });
-      localStorage.setItem("todo_token", response.access_token);
+      // Token is automatically stored by the API client
       mutate(); // Revalidate user data
       return response;
     } catch (error) {
@@ -52,7 +52,19 @@ export function useAuth() {
   const signup = async (username: string, email: string, password: string) => {
     try {
       const response = await api.post("/api/v1/auth/signup", { username, email, password });
-      localStorage.setItem("todo_token", response.access_token);
+      // Token is automatically stored by the API client
+      mutate(); // Revalidate user data
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // Demo function
+  const startDemo = async () => {
+    try {
+      const response = await api.post("/api/v1/auth/demo");
+      // Token is automatically stored by the API client
       mutate(); // Revalidate user data
       return response;
     } catch (error) {
@@ -62,7 +74,10 @@ export function useAuth() {
 
   // Logout function
   const logout = () => {
-    localStorage.removeItem("todo_token");
+    // Remove token from localStorage
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("todo_token");
+    }
     mutate(null, false); // Clear user data without revalidation
   };
 
@@ -71,8 +86,10 @@ export function useAuth() {
     isLoading,
     error,
     isAuthenticated: !!user && !error,
+    isDemo: user?.is_demo || false,
     login,
     signup,
+    startDemo,
     logout,
     mutate,
   };

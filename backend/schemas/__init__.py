@@ -1,22 +1,22 @@
 # schemas/__init__.py
 from .user import (
-    UserBase, UserCreate, UserUpdate, UserInDB, 
-    UserResponse, UserLogin, Token, TokenData
+    UserBase, UserCreate, UserUpdate,
+    UserResponse, UserLogin, Token, TokenData, AuthResponse
 )
 from .task import (
-    TaskBase, TaskCreate, TaskUpdate, TaskInDB, 
-    TaskResponse, TaskWithLabels, TaskStats
+    TaskBase, TaskCreate, TaskUpdate,
+    TaskResponse, TaskListResponse
 )
 from .label import (
-    LabelBase, LabelCreate, LabelUpdate, LabelInDB, 
-    LabelResponse, LabelWithTaskCount
+    LabelBase, LabelCreate, LabelUpdate,
+    LabelResponse, LabelListResponse
 )
 
 __all__ = [
-    "UserBase", "UserCreate", "UserUpdate", "UserInDB", 
-    "UserResponse", "UserLogin", "Token", "TokenData",
-    "TaskBase", "TaskCreate", "TaskUpdate", "TaskInDB", 
-    "TaskResponse", "TaskWithLabels", "TaskStats",
-    "LabelBase", "LabelCreate", "LabelUpdate", "LabelInDB", 
-    "LabelResponse", "LabelWithTaskCount"
+    "UserBase", "UserCreate", "UserUpdate",
+    "UserResponse", "UserLogin", "Token", "TokenData", "AuthResponse",
+    "TaskBase", "TaskCreate", "TaskUpdate",
+    "TaskResponse", "TaskListResponse",
+    "LabelBase", "LabelCreate", "LabelUpdate",
+    "LabelResponse", "LabelListResponse"
 ]

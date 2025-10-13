@@ -1,139 +1,138 @@
-# =============================================================================
-# AUTHENTICATION API ROUTES
-# =============================================================================
-# FastAPI routes for user authentication
-# Handles user registration, login, and JWT token management
-
-from fastapi import APIRouter, Depends, HTTPException, status, Request
 from datetime import timedelta
-from schemas.user import UserCreate, UserLogin, UserResponse, Token
-from models.user import User
-from crud.user import UserCRUD
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from bson import ObjectId
+
+from core.config import settings
+from core.database import get_database
 from core.security import (
-    get_password_hash, 
-    verify_password, 
-    create_access_token, 
-    create_refresh_token,
-    validate_password_strength
+    verify_password,
+    get_password_hash,
+    create_access_token,
+    get_current_active_user
 )
-from api.deps import get_current_user
-from middleware.rate_limiting import auth_rate_limit
+from schemas.user import UserCreate, UserResponse, UserLogin, Token, AuthResponse
 
-router = APIRouter()
+router = APIRouter(prefix="/auth", tags=["Authentication"])
 
-# Token expiration time (30 minutes)
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-@router.post("/signup", response_model=Token, status_code=status.HTTP_201_CREATED)
-@auth_rate_limit
-async def signup(
-    request: Request,
-    user_data: UserCreate
-):
-    """Register a new user account and return JWT token"""
+@router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
+async def register(user_data: UserCreate):
+    """Register a new user"""
+    db = await get_database()
     
-    # Validate password strength
-    is_valid, error_message = validate_password_strength(user_data.password)
-    if not is_valid:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=error_message
-        )
-    
-    user_crud = UserCRUD()
-    
-    # Check if email is already taken
-    if await user_crud.is_email_taken(user_data.email):
+    # Check if user already exists
+    existing_user = await db.users.find_one({"email": user_data.email})
+    if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered"
         )
     
-    # Check if username is already taken
-    if await user_crud.is_username_taken(user_data.username):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already taken"
-        )
+    # Create new user
+    from datetime import datetime
+    user_dict = {
+        "email": user_data.email,
+        "name": user_data.name,
+        "hashed_password": get_password_hash(user_data.password),
+        "is_active": True,
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow()
+    }
     
-    # Hash password and create user
-    hashed_password = get_password_hash(user_data.password)
-    user = await user_crud.create(user_data, hashed_password)
+    result = await db.users.insert_one(user_dict)
+    created_user = await db.users.find_one({"_id": result.inserted_id})
     
-    # Create access token for immediate login
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": str(user.id)}, expires_delta=access_token_expires
-    )
+    # Convert ObjectId to string for response
+    created_user["_id"] = str(created_user["_id"])
     
-    return Token(access_token=access_token, token_type="bearer")
+    # Create access token for the new user
+    access_token = create_access_token(data={"sub": created_user["email"]})
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": created_user
+    }
+
 
 @router.post("/login", response_model=Token)
-@auth_rate_limit
-async def login(
-    request: Request,
-    user_credentials: UserLogin
-):
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """Login user and return JWT token"""
+    db = await get_database()
     
-    user_crud = UserCRUD()
+    # Find user by email
+    user = await db.users.find_one({"email": form_data.username})
     
-    # Get user by email
-    user = await user_crud.get_by_email(user_credentials.email)
-    if not user:
+    if not user or not verify_password(form_data.password, user["hashed_password"]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    # Verify password
-    if not verify_password(user_credentials.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    # Check if user is active
-    if not user.is_active:
+    if not user.get("is_active", True):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Inactive user"
         )
     
     # Create access token
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.jwt_expire_minutes)
     access_token = create_access_token(
-        data={"sub": str(user.id)}, expires_delta=access_token_expires
+        data={"sub": str(user["_id"])},
+        expires_delta=access_token_expires
     )
     
-    return Token(access_token=access_token, token_type="bearer")
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post("/login/json", response_model=AuthResponse)
+async def login_json(user_data: UserLogin):
+    """Login user with JSON payload and return JWT token with user data"""
+    db = await get_database()
+    
+    # Find user by email
+    user = await db.users.find_one({"email": user_data.email})
+    
+    if not user or not verify_password(user_data.password, user["hashed_password"]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    if not user.get("is_active", True):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Inactive user"
+        )
+    
+    # Convert ObjectId to string for response
+    user["_id"] = str(user["_id"])
+    
+    # Create access token
+    access_token_expires = timedelta(minutes=settings.jwt_expire_minutes)
+    access_token = create_access_token(
+        data={"sub": user["email"]},
+        expires_delta=access_token_expires
+    )
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": user
+    }
+
 
 @router.get("/me", response_model=UserResponse)
-async def get_current_user_info(
-    current_user: User = Depends(get_current_user)
-):
+async def get_current_user_info(current_user: dict = Depends(get_current_active_user)):
     """Get current user information"""
-    
-    return UserResponse(
-        id=current_user.id,
-        username=current_user.username,
-        email=current_user.email,
-        is_active=current_user.is_active,
-        created_at=current_user.created_at
-    )
+    current_user["_id"] = str(current_user["_id"])
+    return current_user
 
-@router.post("/refresh", response_model=Token)
-async def refresh_token(
-    current_user: User = Depends(get_current_user)
-):
-    """Refresh JWT token for current user"""
-    
-    # Create new access token
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": current_user.id}, expires_delta=access_token_expires
-    )
-    
-    return Token(access_token=access_token, token_type="bearer")
+
+@router.post("/logout")
+async def logout():
+    """Logout user (token invalidation should be handled on client side)"""
+    return {"message": "Successfully logged out"}

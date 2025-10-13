@@ -37,7 +37,7 @@ export function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
         title,
         description: description || undefined,
         priority,
-        due_date: dueDate || undefined,
+        due_date: dueDate,  // Required field
         label_ids: selectedLabels.length > 0 ? selectedLabels : undefined,
       };
 

@@ -10,6 +10,7 @@ import { TaskList } from "@/components/TaskList";
 import { UserInfo } from "@/components/UserInfo";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { DashboardSkeleton } from "@/components/skeletons";
+import { DemoBanner } from "@/components/DemoBanner";
 import { Task } from "@/types";
 
 // Main dashboard page - protected route that shows user info and task list
@@ -119,6 +120,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Demo Banner */}
+      <DemoBanner />
+      
       {/* Header with user info and logout */}
       <DashboardHeader user={user} onLogout={handleLogout} />
 

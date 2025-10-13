@@ -1,59 +1,37 @@
 # =============================================================================
-# CACHING SYSTEM
+# SIMPLE IN-MEMORY CACHING SYSTEM
 # =============================================================================
-# Redis-based caching system for improved performance
-# Implements cache-aside pattern with TTL support
+# Lightweight in-memory caching for improved performance
+# Note: Redis can be added later for production if needed
 
-import json
-import redis
-import os
 import asyncio
-from typing import Optional, Any, Union
-from datetime import timedelta
+from typing import Optional, Any, Union, Callable
+from datetime import timedelta, datetime
 import logging
 
 logger = logging.getLogger(__name__)
 
-class CacheManager:
-    """Redis-based cache manager with fallback to in-memory cache"""
+
+class SimpleCache:
+    """Simple in-memory cache with TTL support"""
     
     def __init__(self):
-        self.redis_client = None
-        self.memory_cache = {}  # Fallback cache
-        self._initialize_redis()
-    
-    def _initialize_redis(self):
-        """Initialize Redis connection"""
-        try:
-            redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
-            self.redis_client = redis.from_url(redis_url, decode_responses=True)
-            self.redis_client.ping()  # Test connection
-            logger.info("✅ Redis cache connected successfully")
-        except Exception as e:
-            logger.warning(f"⚠️ Redis not available, using memory cache: {e}")
-            self.redis_client = None
-    
-    def _serialize_value(self, value: Any) -> str:
-        """Serialize value for storage"""
-        if isinstance(value, (str, int, float, bool)):
-            return json.dumps(value)
-        return json.dumps(value, default=str)
-    
-    def _deserialize_value(self, value: str) -> Any:
-        """Deserialize value from storage"""
-        try:
-            return json.loads(value)
-        except (json.JSONDecodeError, TypeError):
-            return value
+        self._cache: dict[str, tuple[Any, Optional[datetime]]] = {}
+        logger.info("✅ In-memory cache initialized")
     
     async def get(self, key: str) -> Optional[Any]:
         """Get value from cache"""
         try:
-            if self.redis_client:
-                value = self.redis_client.get(key)
-                return self._deserialize_value(value) if value else None
-            else:
-                return self.memory_cache.get(key)
+            if key in self._cache:
+                value, expires_at = self._cache[key]
+                
+                # Check if expired
+                if expires_at and datetime.utcnow() > expires_at:
+                    del self._cache[key]
+                    return None
+                
+                return value
+            return None
         except Exception as e:
             logger.error(f"Cache get error for key {key}: {e}")
             return None
@@ -64,20 +42,17 @@ class CacheManager:
         value: Any, 
         ttl: Optional[Union[int, timedelta]] = None
     ) -> bool:
-        """Set value in cache with optional TTL"""
+        """Set value in cache with optional TTL (in seconds or timedelta)"""
         try:
-            serialized_value = self._serialize_value(value)
-            
-            if self.redis_client:
-                if ttl:
-                    if isinstance(ttl, timedelta):
-                        ttl = int(ttl.total_seconds())
-                    return self.redis_client.setex(key, ttl, serialized_value)
+            expires_at = None
+            if ttl:
+                if isinstance(ttl, timedelta):
+                    expires_at = datetime.utcnow() + ttl
                 else:
-                    return self.redis_client.set(key, serialized_value)
-            else:
-                self.memory_cache[key] = value
-                return True
+                    expires_at = datetime.utcnow() + timedelta(seconds=ttl)
+            
+            self._cache[key] = (value, expires_at)
+            return True
         except Exception as e:
             logger.error(f"Cache set error for key {key}: {e}")
             return False
@@ -85,47 +60,46 @@ class CacheManager:
     async def delete(self, key: str) -> bool:
         """Delete value from cache"""
         try:
-            if self.redis_client:
-                return bool(self.redis_client.delete(key))
-            else:
-                return self.memory_cache.pop(key, None) is not None
+            if key in self._cache:
+                del self._cache[key]
+                return True
+            return False
         except Exception as e:
             logger.error(f"Cache delete error for key {key}: {e}")
             return False
     
     async def exists(self, key: str) -> bool:
-        """Check if key exists in cache"""
-        try:
-            if self.redis_client:
-                return bool(self.redis_client.exists(key))
-            else:
-                return key in self.memory_cache
-        except Exception as e:
-            logger.error(f"Cache exists error for key {key}: {e}")
-            return False
+        """Check if key exists in cache (and is not expired)"""
+        value = await self.get(key)
+        return value is not None
     
     async def clear_pattern(self, pattern: str) -> int:
-        """Clear all keys matching pattern"""
+        """Clear all keys matching pattern (simple string matching)"""
         try:
-            if self.redis_client:
-                keys = self.redis_client.keys(pattern)
-                if keys:
-                    return self.redis_client.delete(*keys)
-                return 0
-            else:
-                # For memory cache, we need to iterate
-                keys_to_delete = [k for k in self.memory_cache.keys() if pattern.replace('*', '') in k]
-                for key in keys_to_delete:
-                    del self.memory_cache[key]
-                return len(keys_to_delete)
+            pattern_str = pattern.replace('*', '')
+            keys_to_delete = [k for k in self._cache.keys() if pattern_str in k]
+            
+            for key in keys_to_delete:
+                del self._cache[key]
+            
+            return len(keys_to_delete)
         except Exception as e:
             logger.error(f"Cache clear pattern error for {pattern}: {e}")
             return 0
     
+    async def clear_all(self) -> bool:
+        """Clear all cache entries"""
+        try:
+            self._cache.clear()
+            return True
+        except Exception as e:
+            logger.error(f"Cache clear all error: {e}")
+            return False
+    
     async def get_or_set(
         self, 
         key: str, 
-        factory_func, 
+        factory_func: Callable, 
         ttl: Optional[Union[int, timedelta]] = None
     ) -> Any:
         """Get value from cache or set it using factory function"""
@@ -145,71 +119,50 @@ class CacheManager:
         except Exception as e:
             logger.error(f"Cache get_or_set error for key {key}: {e}")
             raise
+    
+    def size(self) -> int:
+        """Get current cache size"""
+        return len(self._cache)
+
 
 # Global cache instance
-cache = CacheManager()
+cache = SimpleCache()
+
 
 # Cache key generators
 def user_cache_key(user_id: str) -> str:
     """Generate cache key for user data"""
     return f"user:{user_id}"
 
+
 def tasks_cache_key(user_id: str) -> str:
     """Generate cache key for user tasks"""
     return f"tasks:{user_id}"
+
 
 def task_cache_key(task_id: str) -> str:
     """Generate cache key for specific task"""
     return f"task:{task_id}"
 
+
 def labels_cache_key(user_id: str) -> str:
     """Generate cache key for user labels"""
     return f"labels:{user_id}"
+
 
 def task_stats_cache_key(user_id: str) -> str:
     """Generate cache key for task statistics"""
     return f"task_stats:{user_id}"
 
-# Cache decorators
-def cache_result(ttl: Optional[Union[int, timedelta]] = None, key_func=None):
-    """Decorator to cache function results"""
-    def decorator(func):
-        async def wrapper(*args, **kwargs):
-            # Generate cache key
-            if key_func:
-                cache_key = key_func(*args, **kwargs)
-            else:
-                cache_key = f"{func.__name__}:{hash(str(args) + str(kwargs))}"
-            
-            # Try to get from cache
-            result = await cache.get(cache_key)
-            if result is not None:
-                return result
-            
-            # Execute function and cache result
-            if asyncio.iscoroutinefunction(func):
-                result = await func(*args, **kwargs)
-            else:
-                result = func(*args, **kwargs)
-            
-            await cache.set(cache_key, result, ttl)
-            return result
-        
-        return wrapper
-    return decorator
 
 # Cache invalidation helpers
 async def invalidate_user_cache(user_id: str):
     """Invalidate all cache entries for a user"""
-    patterns = [
-        f"user:{user_id}",
-        f"tasks:{user_id}",
-        f"labels:{user_id}",
-        f"task_stats:{user_id}",
-    ]
-    
-    for pattern in patterns:
-        await cache.clear_pattern(pattern)
+    await cache.clear_pattern(f"user:{user_id}*")
+    await cache.clear_pattern(f"tasks:{user_id}*")
+    await cache.clear_pattern(f"labels:{user_id}*")
+    await cache.clear_pattern(f"task_stats:{user_id}*")
+
 
 async def invalidate_task_cache(task_id: str, user_id: str):
     """Invalidate cache entries for a specific task"""
@@ -217,9 +170,11 @@ async def invalidate_task_cache(task_id: str, user_id: str):
     await cache.delete(f"tasks:{user_id}")
     await cache.delete(f"task_stats:{user_id}")
 
+
 async def invalidate_label_cache(user_id: str):
     """Invalidate cache entries for user labels"""
     await cache.delete(f"labels:{user_id}")
+
 
 # Health check
 async def cache_health_check() -> dict:
@@ -235,7 +190,8 @@ async def cache_health_check() -> dict:
         
         return {
             "status": "healthy" if retrieved_value == test_value else "unhealthy",
-            "type": "redis" if cache.redis_client else "memory",
+            "type": "memory",
+            "size": cache.size(),
             "test_passed": retrieved_value == test_value
         }
     except Exception as e:

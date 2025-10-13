@@ -1,33 +1,41 @@
-# =============================================================================
-# LABEL MODEL WITH BEANIE
-# =============================================================================
-# Modern ODM for MongoDB with automatic validation and type safety
-# Much cleaner than manual ObjectId handling!
-
-from beanie import Document, Indexed, PydanticObjectId
-from pydantic import Field
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+from pydantic import BaseModel, Field
+from bson import ObjectId
 
-class Label(Document):
-    """Label model with Beanie - automatic MongoDB integration"""
-    
-    # Indexed fields for better performance
-    user_id: Indexed(PydanticObjectId)
+
+class PyObjectId(ObjectId):
+    """Custom ObjectId type for Pydantic models"""
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if not ObjectId.is_valid(v):
+            raise ValueError("Invalid ObjectId")
+        return ObjectId(v)
+
+    @classmethod
+    def __get_pydantic_json_schema__(cls, field_schema):
+        field_schema.update(type="string")
+
+
+class LabelModel(BaseModel):
+    """Label database model"""
+    id: Optional[PyObjectId] = Field(default_factory=PyObjectId, alias="_id")
+    user_id: PyObjectId
     name: str
-    
-    # Regular fields with validation
     color: str = "#3B82F6"  # Default blue color
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
-    
-    class Settings:
-        name = "labels"  # Collection name
-        indexes = [
-            "user_id",
-            "name",
-            "created_at"
-        ]
-    
-    def __str__(self) -> str:
-        return f"Label(name={self.name}, color={self.color})"
+
+    class Config:
+        populate_by_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        json_schema_extra = {
+            "example": {
+                "name": "Work",
+                "color": "#EF4444"
+            }
+        }
