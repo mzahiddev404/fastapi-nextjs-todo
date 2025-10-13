@@ -1,3 +1,5 @@
+"use client";
+
 // TaskForm component for creating and editing tasks
 import { useState } from "react";
 import { Task, TaskCreate, TaskUpdate, Label } from "@/types";

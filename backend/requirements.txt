@@ -17,3 +17,10 @@ bcrypt==4.0.1
 # Utilities
 python-multipart==0.0.6
 python-dotenv==1.0.0
+
+# Security and rate limiting
+slowapi==0.1.9
+redis==5.0.1
+
+# Monitoring and system info
+psutil==5.9.6

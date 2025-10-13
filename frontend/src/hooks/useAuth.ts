@@ -31,6 +31,8 @@ export function useAuth() {
       revalidateOnFocus: false,
       revalidateOnReconnect: true,
       dedupingInterval: 60000, // Cache for 1 minute
+      shouldRetryOnError: false, // Don't retry on auth errors
+      errorRetryCount: 0, // Don't retry at all
     }
   );
 

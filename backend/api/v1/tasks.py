@@ -11,6 +11,15 @@ from models.task import Task, TaskStatus
 from models.user import User
 from crud.task import TaskCRUD
 from api.deps import get_current_user
+from core.error_handling import (
+    not_found_error,
+    validation_error,
+    database_error,
+    AppError
+)
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -21,20 +30,24 @@ async def create_task(
 ):
     """Create a new task for the current user"""
     
-    task_crud = TaskCRUD()
-    task = await task_crud.create(task_data, current_user.id)
-    
-    return TaskResponse(
-        id=task.id,
-        title=task.title,
-        description=task.description,
-        status=task.status.value,
-        user_id=task.user_id,
-        label_ids=task.label_ids,
-        due_date=task.due_date,
-        created_at=task.created_at,
-        updated_at=task.updated_at
-    )
+    try:
+        task_crud = TaskCRUD()
+        task = await task_crud.create(task_data, current_user.id)
+        
+        return TaskResponse(
+            id=task.id,
+            title=task.title,
+            description=task.description,
+            status=task.status.value,
+            user_id=task.user_id,
+            label_ids=task.label_ids,
+            due_date=task.due_date,
+            created_at=task.created_at,
+            updated_at=task.updated_at
+        )
+    except Exception as e:
+        logger.error(f"Error creating task: {e}")
+        raise database_error("Failed to create task", {"error": str(e)})
 
 @router.get("/", response_model=List[TaskResponse])
 async def get_tasks(

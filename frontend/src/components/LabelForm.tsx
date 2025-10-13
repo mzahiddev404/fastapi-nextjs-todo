@@ -1,3 +1,5 @@
+"use client";
+
 // LabelForm component for creating and editing labels
 import { useState } from "react";
 import { Label, LabelCreate, LabelUpdate } from "@/types";

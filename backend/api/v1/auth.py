@@ -4,13 +4,20 @@
 # FastAPI routes for user authentication
 # Handles user registration, login, and JWT token management
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from datetime import timedelta
 from schemas.user import UserCreate, UserLogin, UserResponse, Token
 from models.user import User
 from crud.user import UserCRUD
-from core.security import get_password_hash, verify_password, create_access_token
+from core.security import (
+    get_password_hash, 
+    verify_password, 
+    create_access_token, 
+    create_refresh_token,
+    validate_password_strength
+)
 from api.deps import get_current_user
+from middleware.rate_limiting import auth_rate_limit
 
 router = APIRouter()
 
@@ -18,10 +25,20 @@ router = APIRouter()
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 @router.post("/signup", response_model=Token, status_code=status.HTTP_201_CREATED)
+@auth_rate_limit
 async def signup(
+    request: Request,
     user_data: UserCreate
 ):
     """Register a new user account and return JWT token"""
+    
+    # Validate password strength
+    is_valid, error_message = validate_password_strength(user_data.password)
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=error_message
+        )
     
     user_crud = UserCRUD()
     
@@ -46,13 +63,15 @@ async def signup(
     # Create access token for immediate login
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.id}, expires_delta=access_token_expires
+        data={"sub": str(user.id)}, expires_delta=access_token_expires
     )
     
     return Token(access_token=access_token, token_type="bearer")
 
 @router.post("/login", response_model=Token)
+@auth_rate_limit
 async def login(
+    request: Request,
     user_credentials: UserLogin
 ):
     """Login user and return JWT token"""
@@ -86,7 +105,7 @@ async def login(
     # Create access token
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.id}, expires_delta=access_token_expires
+        data={"sub": str(user.id)}, expires_delta=access_token_expires
     )
     
     return Token(access_token=access_token, token_type="bearer")

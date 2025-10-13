@@ -7,7 +7,11 @@
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 from typing import AsyncGenerator
+from dotenv import load_dotenv
 import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Import your Beanie models
 from models.user import User
@@ -29,8 +33,9 @@ async def connect_to_mongo():
     """Initialize Beanie with MongoDB"""
     global client, database
     
-    # Get MongoDB URL from environment variables
-    mongo_url = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
+    # Get MongoDB URL and database name from environment variables
+    mongo_url = os.getenv("project_db_url", "mongodb://localhost:27017")
+    db_name = os.getenv("project_db_name", "todo_app_db")
     
     # Create MongoDB client with enhanced SSL configuration for Python 3.13 compatibility
     try:
@@ -57,7 +62,7 @@ async def connect_to_mongo():
             # For local connections, use standard settings
             client = AsyncIOMotorClient(mongo_url)
         
-        database = client.todo_app  # Database name
+        database = client[db_name]  # Database name from environment
         
         # Initialize Beanie with your models - this is the magic! ✨
         await init_beanie(
