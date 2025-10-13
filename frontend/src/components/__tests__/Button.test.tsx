@@ -23,7 +23,7 @@ describe('Button Component', () => {
   });
 
   it('applies correct variant classes', () => {
-    render(<Button variant="danger">Delete</Button>);
+    render(<Button variant="destructive">Delete</Button>);
     const button = screen.getByRole('button');
     expect(button).toHaveClass('bg-red-600');
   });

@@ -126,3 +126,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Environment files
+.env
+.env.local
+.env*.local
+backend/.env
+frontend/.env
+frontend/.env.local
+

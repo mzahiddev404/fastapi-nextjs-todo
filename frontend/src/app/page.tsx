@@ -74,7 +74,7 @@ export default function Home() {
 
   const handleToggleTaskStatus = async (task: Task) => {
     try {
-      await updateTaskStatus(task.id, task.status === "completed" ? "pending" : "completed");
+      await updateTaskStatus(task.id, task.status === "complete" ? "incomplete" : "complete");
     } catch (error) {
       console.error("Failed to update task status:", error);
     }
@@ -124,7 +124,7 @@ export default function Home() {
       <DemoBanner />
       
       {/* Header with user info and logout */}
-      <DashboardHeader user={user} onLogout={handleLogout} />
+      {user && <DashboardHeader user={user} onLogout={handleLogout} />}
 
       {/* Main content area */}
       <main id="main-content" className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8" role="main">
@@ -171,7 +171,7 @@ export default function Home() {
           />
 
           {/* User info card */}
-          <UserInfo user={user} />
+          {user && <UserInfo user={user} />}
         </div>
       </main>
 

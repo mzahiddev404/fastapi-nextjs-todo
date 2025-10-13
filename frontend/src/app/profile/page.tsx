@@ -83,12 +83,12 @@ export default function ProfilePage() {
   // Calculate task statistics
   const taskStats = {
     total: tasks.length,
-    completed: tasks.filter(task => task.status === "completed").length,
-    pending: tasks.filter(task => task.status === "pending").length,
+    completed: tasks.filter(task => task.status === "complete").length,
+    pending: tasks.filter(task => task.status === "incomplete").length,
     overdue: tasks.filter(task => 
-      task.due_date && 
-      new Date(task.due_date) < new Date() && 
-      task.status !== "completed"
+      task.deadline && 
+      new Date(task.deadline) < new Date() && 
+      task.status !== "complete"
     ).length,
   };
 
@@ -178,7 +178,7 @@ export default function ProfilePage() {
                     <div className="flex items-center space-x-3">
                       <Button
                         type="submit"
-                        variant="primary"
+                        
                         disabled={isSaving}
                       >
                         {isSaving ? "Saving..." : "Save Changes"}
@@ -289,7 +289,7 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Button
                     onClick={() => router.push("/")}
-                    variant="primary"
+                    
                     className="w-full"
                   >
                     View All Tasks

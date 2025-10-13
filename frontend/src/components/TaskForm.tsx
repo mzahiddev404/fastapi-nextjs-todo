@@ -17,8 +17,8 @@ export function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
   const [title, setTitle] = useState(task?.title || "");
   const [description, setDescription] = useState(task?.description || "");
   const [priority, setPriority] = useState<"low" | "medium" | "high">(task?.priority || "medium");
-  const [dueDate, setDueDate] = useState(task?.due_date || "");
-  const [selectedLabels, setSelectedLabels] = useState<string[]>(task?.label_ids || []);
+  const [dueDate, setDueDate] = useState(task?.deadline || "");
+  const [selectedLabels, setSelectedLabels] = useState<string[]>(task?.labels || []);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -37,8 +37,8 @@ export function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
         title,
         description: description || undefined,
         priority,
-        due_date: dueDate,  // Required field
-        label_ids: selectedLabels.length > 0 ? selectedLabels : undefined,
+        deadline: dueDate,  // Required field
+        labels: selectedLabels.length > 0 ? selectedLabels : undefined,
       };
 
       if (isEditing) {

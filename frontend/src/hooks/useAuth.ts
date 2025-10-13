@@ -63,7 +63,7 @@ export function useAuth() {
   // Demo function
   const startDemo = async () => {
     try {
-      const response = await api.post("/api/v1/auth/demo");
+      const response = await api.post("/api/v1/auth/demo", {});
       // Token is automatically stored by the API client
       mutate(); // Revalidate user data
       return response;
@@ -78,7 +78,7 @@ export function useAuth() {
     if (typeof window !== "undefined") {
       localStorage.removeItem("todo_token");
     }
-    mutate(null, false); // Clear user data without revalidation
+    mutate(undefined, false); // Clear user data without revalidation
   };
 
   return {

@@ -400,7 +400,7 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
                       </Button>
                     </Link>
                     <Link href="/">
-                      <Button variant="primary">
+                      <Button>
                         Back to Dashboard
                       </Button>
                     </Link>

@@ -17,7 +17,7 @@ export default function TaskStatusPage() {
   const { user } = useAuth();
 
   // Validate status parameter
-  const validStatuses = ["pending", "completed"];
+  const validStatuses = ["incomplete", "complete"];
   const isValidStatus = validStatuses.includes(status);
 
   // Filter tasks by status
@@ -33,7 +33,7 @@ export default function TaskStatusPage() {
 
   const handleToggleTaskStatus = async (task: Task) => {
     try {
-      const newStatus = task.status === "completed" ? "pending" : "completed";
+      const newStatus = task.status === "complete" ? "incomplete" : "complete";
       await updateTaskStatus(task.id, newStatus);
     } catch (error) {
       console.error("Failed to update task status:", error);
@@ -94,7 +94,7 @@ export default function TaskStatusPage() {
               Invalid Status
             </h1>
             <p className="text-gray-600">
-              The status "{status}" is not valid. Please use "pending" or "completed".
+              The status "{status}" is not valid. Please use "incomplete" or "complete".
             </p>
           </div>
           <Button onClick={() => router.push("/")} className="w-full">
@@ -105,8 +105,8 @@ export default function TaskStatusPage() {
     );
   }
 
-  const statusDisplayName = status === "completed" ? "Completed" : "Pending";
-  const statusColor = status === "completed" ? "green" : "yellow";
+  const statusDisplayName = status === "complete" ? "Completed" : "Pending";
+  const statusColor = status === "complete" ? "green" : "yellow";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -165,14 +165,14 @@ export default function TaskStatusPage() {
                 <div className="flex items-center space-x-2">
                   <Button
                     onClick={() => router.push("/tasks/status/pending")}
-                    variant={status === "pending" ? "primary" : "secondary"}
+                    variant="secondary"
                     size="sm"
                   >
                     Pending
                   </Button>
                   <Button
                     onClick={() => router.push("/tasks/status/completed")}
-                    variant={status === "completed" ? "primary" : "secondary"}
+                    variant="secondary"
                     size="sm"
                   >
                     Completed
@@ -204,11 +204,11 @@ export default function TaskStatusPage() {
                 No {statusDisplayName.toLowerCase()} tasks
               </h3>
               <p className="text-gray-500 mb-4">
-                {status === "pending"
+                {status === "incomplete"
                   ? "You don't have any pending tasks at the moment."
                   : "You haven't completed any tasks yet."}
               </p>
-              <Button onClick={handleCreateTask} variant="primary">
+              <Button onClick={handleCreateTask} >
                 Create New Task
               </Button>
             </div>

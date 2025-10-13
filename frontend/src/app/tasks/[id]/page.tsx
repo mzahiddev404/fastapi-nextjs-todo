@@ -31,7 +31,7 @@ export default function TaskDetailPage() {
     if (!task) return;
     
     try {
-      const newStatus = task.status === "completed" ? "pending" : "completed";
+      const newStatus = task.status === "complete" ? "incomplete" : "complete";
       await updateTaskStatus(task.id, newStatus);
     } catch (error) {
       console.error("Failed to update task status:", error);
@@ -152,19 +152,19 @@ export default function TaskDetailPage() {
                   <div className="flex items-center space-x-4">
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        task.status === "completed"
+                        task.status === "complete"
                           ? "bg-green-100 text-green-800"
                           : "bg-yellow-100 text-yellow-800"
                       }`}
                     >
-                      {task.status === "completed" ? "Completed" : "Pending"}
+                      {task.status === "complete" ? "Completed" : "Pending"}
                     </span>
                     <span className="text-sm text-gray-500">
                       Created: {new Date(task.created_at).toLocaleDateString()}
                     </span>
-                    {task.due_date && (
+                    {task.deadline && (
                       <span className="text-sm text-gray-500">
-                        Due: {new Date(task.due_date).toLocaleDateString()}
+                        Due: {new Date(task.deadline).toLocaleDateString()}
                       </span>
                     )}
                   </div>
@@ -172,10 +172,10 @@ export default function TaskDetailPage() {
                 <div className="flex items-center space-x-2">
                   <Button
                     onClick={handleToggleStatus}
-                    variant={task.status === "completed" ? "secondary" : "primary"}
+                    variant="secondary"
                     size="sm"
                   >
-                    {task.status === "completed" ? "Mark Pending" : "Mark Complete"}
+                    {task.status === "complete" ? "Mark Pending" : "Mark Complete"}
                   </Button>
                   <Button
                     onClick={handleEdit}
@@ -186,7 +186,7 @@ export default function TaskDetailPage() {
                   </Button>
                   <Button
                     onClick={handleDelete}
-                    variant="danger"
+                    variant="destructive"
                     size="sm"
                     disabled={isDeleting}
                   >
@@ -208,14 +208,9 @@ export default function TaskDetailPage() {
                 <div className="mb-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-2">Labels</h3>
                   <div className="flex flex-wrap gap-2">
-                    {task.labels.map((label) => (
-                      <span
-                        key={label.id}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                      >
-                        {label.name}
-                      </span>
-                    ))}
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {task.labels.length} label(s) assigned
+                    </span>
                   </div>
                 </div>
               )}
@@ -227,7 +222,7 @@ export default function TaskDetailPage() {
                     <div>
                       <dt className="text-sm font-medium text-gray-500">Status</dt>
                       <dd className="text-sm text-gray-900">
-                        {task.status === "completed" ? "Completed" : "Pending"}
+                        {task.status === "complete" ? "Completed" : "Pending"}
                       </dd>
                     </div>
                     <div>
@@ -253,18 +248,18 @@ export default function TaskDetailPage() {
                   </dl>
                 </div>
 
-                {task.due_date && (
+                {task.deadline && (
                   <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Due Date</h3>
                     <div className="text-sm text-gray-900">
-                      {new Date(task.due_date).toLocaleDateString("en-US", {
+                      {new Date(task.deadline).toLocaleDateString("en-US", {
                         weekday: "long",
                         year: "numeric",
                         month: "long",
                         day: "numeric",
                       })}
                     </div>
-                    {new Date(task.due_date) < new Date() && task.status !== "completed" && (
+                    {new Date(task.deadline) < new Date() && task.status !== "complete" && (
                       <div className="mt-2 text-sm text-red-600 font-medium">
                         Overdue
                       </div>

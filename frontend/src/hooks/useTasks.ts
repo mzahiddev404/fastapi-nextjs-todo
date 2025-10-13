@@ -41,7 +41,7 @@ export function useTasks() {
   };
 
   // Update task status
-  const updateTaskStatus = async (taskId: string, status: "pending" | "completed") => {
+  const updateTaskStatus = async (taskId: string, status: "incomplete" | "complete") => {
     try {
       const updatedTask = await api.patch<Task>(`/api/v1/tasks/${taskId}/status`, { status });
       mutate(); // Revalidate tasks list

@@ -222,7 +222,7 @@ export default async function DocsPage() {
               </p>
               <div className="flex items-center justify-center space-x-4">
                 <Link href="/docs/getting-started">
-                  <Button variant="primary" size="lg">
+                  <Button size="lg">
                     Start Here
                   </Button>
                 </Link>

@@ -21,9 +21,9 @@ const mockTasks: Task[] = [
     id: '1',
     title: 'Test Task 1',
     description: 'Test description 1',
-    status: 'pending',
+    status: 'incomplete',
     priority: 'high',
-    due_date: '2024-01-15',
+    deadline: '2024-01-15',
     labels: [
       { id: '1', name: 'Work', color: '#ff0000' }
     ],
@@ -35,9 +35,9 @@ const mockTasks: Task[] = [
     id: '2',
     title: 'Test Task 2',
     description: 'Test description 2',
-    status: 'completed',
+    status: 'complete',
     priority: 'medium',
-    due_date: '2024-01-20',
+    deadline: '2024-01-20',
     labels: [
       { id: '2', name: 'Personal', color: '#00ff00' }
     ],

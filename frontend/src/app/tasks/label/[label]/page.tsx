@@ -25,7 +25,7 @@ export default function TaskLabelPage() {
   const filteredTasks = useMemo(() => {
     if (!label) return [];
     return tasks.filter(task => 
-      task.labels && task.labels.some(taskLabel => taskLabel.id === label.id)
+      task.labels && task.labels.includes(label.id)
     );
   }, [tasks, label]);
 
@@ -36,7 +36,7 @@ export default function TaskLabelPage() {
 
   const handleToggleTaskStatus = async (task: Task) => {
     try {
-      const newStatus = task.status === "completed" ? "pending" : "completed";
+      const newStatus = task.status === "complete" ? "incomplete" : "complete";
       await updateTaskStatus(task.id, newStatus);
     } catch (error) {
       console.error("Failed to update task status:", error);
@@ -200,7 +200,7 @@ export default function TaskLabelPage() {
               <p className="text-gray-500 mb-4">
                 There are no tasks with the label "{label.name}" at the moment.
               </p>
-              <Button onClick={handleCreateTask} variant="primary">
+              <Button onClick={handleCreateTask} >
                 Create New Task
               </Button>
             </div>

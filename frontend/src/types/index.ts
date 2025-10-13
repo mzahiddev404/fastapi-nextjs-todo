@@ -17,8 +17,8 @@ export interface Task {
   description?: string;
   status: 'incomplete' | 'complete';
   priority: 'low' | 'medium' | 'high';
-  due_date: string;  // Required field
-  label_ids?: string[];
+  deadline: string;  // Required field - matches backend
+  labels?: string[];  // Matches backend
   user_id: string;
   created_at: string;
   updated_at: string;
@@ -48,8 +48,8 @@ export interface TaskCreate {
   title: string;
   description?: string;
   priority: 'low' | 'medium' | 'high';
-  due_date: string;  // Required field
-  label_ids?: string[];
+  deadline: string;  // Required field - matches backend
+  labels?: string[];  // Matches backend
 }
 
 export interface TaskUpdate {
@@ -57,8 +57,8 @@ export interface TaskUpdate {
   description?: string;
   status?: 'incomplete' | 'complete';
   priority?: 'low' | 'medium' | 'high';
-  due_date?: string;
-  label_ids?: string[];
+  deadline?: string;  // Matches backend
+  labels?: string[];  // Matches backend
 }
 
 export interface LabelCreate {

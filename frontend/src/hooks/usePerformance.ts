@@ -167,8 +167,8 @@ function sendMetricsToAnalytics(componentName: string, metrics: PerformanceMetri
       networkRequests: metrics.networkRequests,
       errors: metrics.errors
     },
-    userAgent: navigator.userAgent,
-    url: window.location.href
+    userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'server',
+    url: typeof window !== 'undefined' ? window.location.href : 'server'
   };
 
   // Example: Send to custom analytics endpoint
@@ -193,8 +193,10 @@ export function usePagePerformance(pageName: string) {
   // Track page load time
   useEffect(() => {
     const handleLoad = () => {
-      const loadTime = performance.now();
-      console.log(`[Performance] Page ${pageName} loaded in ${loadTime}ms`);
+      if (typeof window !== 'undefined' && window.performance) {
+        const loadTime = window.performance.now();
+        console.log(`[Performance] Page ${pageName} loaded in ${loadTime}ms`);
+      }
     };
 
     if (document.readyState === 'complete') {
