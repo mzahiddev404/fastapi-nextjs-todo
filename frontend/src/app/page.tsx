@@ -147,14 +147,14 @@ export default function Home() {
                     <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
                     <div className="flex items-center space-x-2">
                       <Button
-                        onClick={() => router.push("/tasks/status/pending")}
+                        onClick={() => router.push("/tasks/status/incomplete")}
                         variant="secondary"
                         size="sm"
                       >
                         View Pending
                       </Button>
                       <Button
-                        onClick={() => router.push("/tasks/status/completed")}
+                        onClick={() => router.push("/tasks/status/complete")}
                         variant="secondary"
                         size="sm"
                       >
