@@ -83,6 +83,19 @@ export function useAuth() {
     }
   };
 
+  // Change password function
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    try {
+      const response = await api.put("/api/v1/auth/password", { 
+        current_password: currentPassword, 
+        new_password: newPassword 
+      });
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   // Logout function
   const logout = () => {
     // Remove token from localStorage
@@ -103,6 +116,7 @@ export function useAuth() {
     startDemo,
     logout,
     updateProfile,
+    changePassword,
     mutate,
   };
 }

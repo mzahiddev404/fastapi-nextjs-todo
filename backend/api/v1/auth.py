@@ -11,7 +11,7 @@ from core.security import (
     create_access_token,
     get_current_active_user
 )
-from schemas.user import UserCreate, UserResponse, UserLogin, UserUpdate, Token, AuthResponse
+from schemas.user import UserCreate, UserResponse, UserLogin, UserUpdate, PasswordChange, Token, AuthResponse
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -289,3 +289,52 @@ async def update_profile(
     result["id"] = str(result["_id"])
     
     return result
+
+
+@router.put("/password", status_code=status.HTTP_200_OK)
+async def change_password(
+    password_data: PasswordChange,
+    current_user: dict = Depends(get_current_active_user)
+):
+    """
+    Change the current user's password.
+    Requires current password for verification.
+    """
+    db = await get_database()
+    
+    # Get user from database
+    user = await db.users.find_one({"_id": ObjectId(current_user["_id"])})
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Verify current password
+    if not verify_password(password_data.current_password, user["hashed_password"]):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect"
+        )
+    
+    # Hash new password
+    hashed_password = get_password_hash(password_data.new_password)
+    
+    # Update password in database
+    result = await db.users.update_one(
+        {"_id": ObjectId(current_user["_id"])},
+        {
+            "$set": {
+                "hashed_password": hashed_password,
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to update password"
+        )
+    
+    return {"message": "Password updated successfully"}

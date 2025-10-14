@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, Input, Alert, LoadingSpinner } from "@/components/ui";
 import { useAuth } from "@/hooks/useAuth";
 import { useTasks } from "@/hooks/useTasks";
@@ -9,21 +9,56 @@ import { useTasks } from "@/hooks/useTasks";
 // User profile page
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, isLoading: authLoading, error: authError, isAuthenticated, updateProfile } = useAuth();
+  const { user, isLoading: authLoading, error: authError, isAuthenticated, updateProfile, changePassword } = useAuth();
   const { tasks, isLoading: tasksLoading } = useTasks();
   const [isEditing, setIsEditing] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
   });
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
+  const [hasToken, setHasToken] = useState(false);
+
+  // Check if component is mounted and if token exists (client-side only)
+  useEffect(() => {
+    setIsMounted(true);
+    if (typeof window !== 'undefined') {
+      setHasToken(!!localStorage.getItem('todo_token'));
+    }
+  }, []);
 
   // Redirect to login if not authenticated
-  if (!authLoading && !isAuthenticated) {
-    router.push("/auth/login");
-    return null;
+  useEffect(() => {
+    if (isMounted && !authLoading && !isAuthenticated && !hasToken) {
+      router.push("/auth/login");
+    }
+  }, [isMounted, authLoading, isAuthenticated, hasToken, router]);
+
+  // Show loading while checking authentication or during SSR
+  if (!isMounted || authLoading || (hasToken && !user && !authError)) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner size="lg" text="Loading profile..." />
+      </div>
+    );
+  }
+
+  // Don't render anything while redirecting
+  if (!isAuthenticated && !hasToken) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner size="lg" text="Redirecting..." />
+      </div>
+    );
   }
 
   // Loading state
@@ -74,10 +109,58 @@ export default function ProfilePage() {
     }
   };
 
+  // Handle password change
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    setSaveError("");
+    setSuccessMessage("");
+
+    // Validate passwords match
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setSaveError("New passwords do not match");
+      setIsSaving(false);
+      return;
+    }
+
+    // Validate password length
+    if (passwordData.newPassword.length < 8) {
+      setSaveError("Password must be at least 8 characters");
+      setIsSaving(false);
+      return;
+    }
+
+    try {
+      await changePassword(passwordData.currentPassword, passwordData.newPassword);
+      setSuccessMessage("Password updated successfully!");
+      setIsChangingPassword(false);
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Failed to update password");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   // Handle form changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Handle password form changes
+  const handlePasswordDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPasswordData(prev => ({
       ...prev,
       [name]: value,
     }));
@@ -239,6 +322,109 @@ export default function ProfilePage() {
                       </p>
                     </div>
                   </div>
+                )}
+              </div>
+            </div>
+
+            {/* Change Password */}
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-medium text-gray-900">Change Password</h2>
+                  {!isChangingPassword && (
+                    <Button
+                      onClick={() => {
+                        setIsChangingPassword(true);
+                        setSaveError("");
+                        setSuccessMessage("");
+                      }}
+                      variant="secondary"
+                      size="sm"
+                    >
+                      Change Password
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              <div className="px-6 py-4">
+                {isChangingPassword ? (
+                  <form onSubmit={handlePasswordChange} className="space-y-4">
+                    <div>
+                      <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                        Current Password
+                      </label>
+                      <Input
+                        id="currentPassword"
+                        name="currentPassword"
+                        type="password"
+                        value={passwordData.currentPassword}
+                        onChange={handlePasswordDataChange}
+                        placeholder="Enter current password"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                        New Password
+                      </label>
+                      <Input
+                        id="newPassword"
+                        name="newPassword"
+                        type="password"
+                        value={passwordData.newPassword}
+                        onChange={handlePasswordDataChange}
+                        placeholder="Enter new password (min 8 characters)"
+                        required
+                        minLength={8}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                        Confirm New Password
+                      </label>
+                      <Input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        value={passwordData.confirmPassword}
+                        onChange={handlePasswordDataChange}
+                        placeholder="Re-enter new password"
+                        required
+                        minLength={8}
+                      />
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <Button
+                        type="submit"
+                        disabled={isSaving}
+                      >
+                        {isSaving ? "Updating..." : "Update Password"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() => {
+                          setIsChangingPassword(false);
+                          setPasswordData({
+                            currentPassword: "",
+                            newPassword: "",
+                            confirmPassword: "",
+                          });
+                          setSaveError("");
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                ) : (
+                  <p className="text-sm text-gray-600">
+                    Click "Change Password" to update your password securely.
+                  </p>
                 )}
               </div>
             </div>

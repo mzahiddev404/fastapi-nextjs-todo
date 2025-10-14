@@ -26,6 +26,12 @@ class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
 
 
+class PasswordChange(BaseModel):
+    """Schema for changing user password"""
+    current_password: str = Field(..., description="Current password")
+    new_password: str = Field(..., min_length=8, description="New password (min 8 characters)")
+
+
 class UserResponse(UserBase):
     """Schema for user response (without password)"""
     id: str = Field(..., alias="_id")
