@@ -11,7 +11,7 @@ from models.task import Priority, TaskStatus
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 
-@router.post("", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=TaskResponse, response_model_by_alias=False, status_code=status.HTTP_201_CREATED)
 async def create_task(
     task_data: TaskCreate,
     current_user: dict = Depends(get_current_active_user)
@@ -56,14 +56,16 @@ async def create_task(
     created_task = await db.tasks.find_one({"_id": result.inserted_id})
     
     # Convert ObjectIds to strings for response
-    created_task["_id"] = str(created_task["_id"])
+    task_id = str(created_task["_id"])
+    created_task["_id"] = task_id
+    created_task["id"] = task_id  # Add id field for frontend compatibility
     created_task["user_id"] = str(created_task["user_id"])
     created_task["labels"] = [str(label_id) for label_id in created_task["labels"]]
     
     return created_task
 
 
-@router.get("", response_model=TaskListResponse)
+@router.get("", response_model=TaskListResponse, response_model_by_alias=False)
 async def get_tasks(
     status: Optional[TaskStatus] = None,
     priority: Optional[Priority] = None,
@@ -101,14 +103,16 @@ async def get_tasks(
     
     # Convert ObjectIds to strings
     for task in tasks:
-        task["_id"] = str(task["_id"])
+        task_id = str(task["_id"])
+        task["_id"] = task_id
+        task["id"] = task_id  # Add id field for frontend compatibility
         task["user_id"] = str(task["user_id"])
         task["labels"] = [str(label_id) for label_id in task["labels"]]
     
     return {"tasks": tasks, "total": total}
 
 
-@router.get("/{task_id}", response_model=TaskResponse)
+@router.get("/{task_id}", response_model=TaskResponse, response_model_by_alias=False)
 async def get_task(
     task_id: str,
     current_user: dict = Depends(get_current_active_user)
@@ -133,14 +137,16 @@ async def get_task(
         )
     
     # Convert ObjectIds to strings
-    task["_id"] = str(task["_id"])
+    task_id = str(task["_id"])
+    task["_id"] = task_id
+    task["id"] = task_id  # Add id field for frontend compatibility
     task["user_id"] = str(task["user_id"])
     task["labels"] = [str(label_id) for label_id in task["labels"]]
     
     return task
 
 
-@router.put("/{task_id}", response_model=TaskResponse)
+@router.put("/{task_id}", response_model=TaskResponse, response_model_by_alias=False)
 async def update_task(
     task_id: str,
     task_data: TaskUpdate,
@@ -220,14 +226,16 @@ async def update_task(
     updated_task = await db.tasks.find_one({"_id": ObjectId(task_id)})
     
     # Convert ObjectIds to strings
-    updated_task["_id"] = str(updated_task["_id"])
+    task_id_str = str(updated_task["_id"])
+    updated_task["_id"] = task_id_str
+    updated_task["id"] = task_id_str  # Add id field for frontend compatibility
     updated_task["user_id"] = str(updated_task["user_id"])
     updated_task["labels"] = [str(label_id) for label_id in updated_task["labels"]]
     
     return updated_task
 
 
-@router.patch("/{task_id}/status", response_model=TaskResponse)
+@router.patch("/{task_id}/status", response_model=TaskResponse, response_model_by_alias=False)
 async def update_task_status(
     task_id: str,
     status_data: dict,
@@ -289,7 +297,9 @@ async def update_task_status(
     updated_task = await db.tasks.find_one({"_id": ObjectId(task_id)})
     
     # Convert ObjectIds to strings
-    updated_task["_id"] = str(updated_task["_id"])
+    task_id_str = str(updated_task["_id"])
+    updated_task["_id"] = task_id_str
+    updated_task["id"] = task_id_str  # Add id field for frontend compatibility
     updated_task["user_id"] = str(updated_task["user_id"])
     updated_task["labels"] = [str(label_id) for label_id in updated_task["labels"]]
     

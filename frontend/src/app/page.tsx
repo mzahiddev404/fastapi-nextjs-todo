@@ -85,9 +85,13 @@ export default function Home() {
 
   const handleToggleTaskStatus = async (task: Task) => {
     try {
-      await updateTaskStatus(task.id, task.status === "complete" ? "incomplete" : "complete");
+      console.log("🔄 Toggling task status:", task.id, "from", task.status, "to", task.status === "complete" ? "incomplete" : "complete");
+      const newStatus = task.status === "complete" ? "incomplete" : "complete";
+      await updateTaskStatus(task.id, newStatus);
+      console.log("✅ Task status updated successfully");
     } catch (error) {
-      console.error("Failed to update task status:", error);
+      console.error("❌ Failed to update task status:", error);
+      alert("Failed to update task status. Please try again.");
     }
   };
 
