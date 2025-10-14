@@ -3,8 +3,17 @@ import useSWR from "swr";
 import { Label, LabelCreate, LabelUpdate } from "@/types";
 import { api } from "@/lib/apiClient";
 
+// Response type from backend for label list
+interface LabelListResponse {
+  labels: Label[];
+  total: number;
+}
+
 // Fetcher function for SWR
-const fetcher = (url: string) => api.get<Label[]>(url);
+const fetcher = async (url: string): Promise<Label[]> => {
+  const response = await api.get<LabelListResponse>(url);
+  return response.labels; // Extract labels array from response
+};
 
 export function useLabels() {
   // Fetch all labels

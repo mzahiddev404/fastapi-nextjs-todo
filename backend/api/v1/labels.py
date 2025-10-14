@@ -10,7 +10,7 @@ from schemas.label import LabelCreate, LabelUpdate, LabelResponse, LabelListResp
 router = APIRouter(prefix="/labels", tags=["Labels"])
 
 
-@router.post("", response_model=LabelResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=LabelResponse, response_model_by_alias=False, status_code=status.HTTP_201_CREATED)
 async def create_label(
     label_data: LabelCreate,
     current_user: dict = Depends(get_current_active_user)
@@ -42,13 +42,15 @@ async def create_label(
     created_label = await db.labels.find_one({"_id": result.inserted_id})
     
     # Convert ObjectIds to strings for response
-    created_label["_id"] = str(created_label["_id"])
+    label_id = str(created_label["_id"])
+    created_label["_id"] = label_id
+    created_label["id"] = label_id  # Add id field for frontend compatibility
     created_label["user_id"] = str(created_label["user_id"])
     
     return created_label
 
 
-@router.get("", response_model=LabelListResponse)
+@router.get("", response_model=LabelListResponse, response_model_by_alias=False)
 async def get_labels(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
@@ -69,13 +71,15 @@ async def get_labels(
     
     # Convert ObjectIds to strings
     for label in labels:
-        label["_id"] = str(label["_id"])
+        label_id = str(label["_id"])
+        label["_id"] = label_id
+        label["id"] = label_id  # Add id field for frontend compatibility
         label["user_id"] = str(label["user_id"])
     
     return {"labels": labels, "total": total}
 
 
-@router.get("/{label_id}", response_model=LabelResponse)
+@router.get("/{label_id}", response_model=LabelResponse, response_model_by_alias=False)
 async def get_label(
     label_id: str,
     current_user: dict = Depends(get_current_active_user)
@@ -100,13 +104,15 @@ async def get_label(
         )
     
     # Convert ObjectIds to strings
-    label["_id"] = str(label["_id"])
+    label_id_str = str(label["_id"])
+    label["_id"] = label_id_str
+    label["id"] = label_id_str  # Add id field for frontend compatibility
     label["user_id"] = str(label["user_id"])
     
     return label
 
 
-@router.put("/{label_id}", response_model=LabelResponse)
+@router.put("/{label_id}", response_model=LabelResponse, response_model_by_alias=False)
 async def update_label(
     label_id: str,
     label_data: LabelUpdate,
@@ -169,7 +175,9 @@ async def update_label(
     updated_label = await db.labels.find_one({"_id": ObjectId(label_id)})
     
     # Convert ObjectIds to strings
-    updated_label["_id"] = str(updated_label["_id"])
+    label_id_str = str(updated_label["_id"])
+    updated_label["_id"] = label_id_str
+    updated_label["id"] = label_id_str  # Add id field for frontend compatibility
     updated_label["user_id"] = str(updated_label["user_id"])
     
     return updated_label
