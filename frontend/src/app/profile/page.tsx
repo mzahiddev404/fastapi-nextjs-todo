@@ -92,6 +92,31 @@ export default function ProfilePage() {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Build list of changes
+    const changes = [];
+    if (formData.name !== user?.name) {
+      changes.push(`name to "${formData.name || 'Not set'}"`);
+    }
+    if (formData.email !== user?.email) {
+      changes.push(`email to "${formData.email}"`);
+    }
+    
+    // If no changes, don't proceed
+    if (changes.length === 0) {
+      setSaveError("No changes detected");
+      return;
+    }
+    
+    // Ask for confirmation
+    const changeText = changes.length === 1 
+      ? `Change ${changes[0]}`
+      : `Change ${changes.join(" and ")}`;
+    
+    if (!window.confirm(`${changeText}?\n\nThis will update your profile information.`)) {
+      return;
+    }
+    
     setIsSaving(true);
     setSaveError("");
     setSuccessMessage("");
@@ -103,7 +128,20 @@ export default function ProfilePage() {
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
-      setSaveError(error instanceof Error ? error.message : "Failed to update profile");
+      let errorMessage = "Failed to update profile";
+      
+      if (error instanceof Error) {
+        // Handle specific error messages
+        if (error.message.includes("Failed to fetch")) {
+          errorMessage = "Cannot connect to server. Please check your internet connection.";
+        } else if (error.message.includes("Email already registered")) {
+          errorMessage = "This email is already in use by another account.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setSaveError(errorMessage);
     } finally {
       setIsSaving(false);
     }
@@ -112,23 +150,27 @@ export default function ProfilePage() {
   // Handle password change
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSaving(true);
     setSaveError("");
     setSuccessMessage("");
 
     // Validate passwords match
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setSaveError("New passwords do not match");
-      setIsSaving(false);
       return;
     }
 
     // Validate password length
     if (passwordData.newPassword.length < 8) {
       setSaveError("Password must be at least 8 characters");
-      setIsSaving(false);
       return;
     }
+    
+    // Ask for confirmation
+    if (!window.confirm("Change your password?\n\nYou will need to use the new password for future logins.")) {
+      return;
+    }
+
+    setIsSaving(true);
 
     try {
       await changePassword(passwordData.currentPassword, passwordData.newPassword);
@@ -142,7 +184,20 @@ export default function ProfilePage() {
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
-      setSaveError(error instanceof Error ? error.message : "Failed to update password");
+      let errorMessage = "Failed to update password";
+      
+      if (error instanceof Error) {
+        // Handle specific error messages
+        if (error.message.includes("Failed to fetch")) {
+          errorMessage = "Cannot connect to server. Please check your internet connection.";
+        } else if (error.message.includes("Current password is incorrect")) {
+          errorMessage = "Current password is incorrect. Please try again.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setSaveError(errorMessage);
     } finally {
       setIsSaving(false);
     }
