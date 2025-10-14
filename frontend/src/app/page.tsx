@@ -150,7 +150,15 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Floating particles background */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 left-10 w-32 h-32 bg-yellow-400/30 rounded-full blur-2xl animate-bounce" style={{ animationDuration: '3s' }}></div>
+        <div className="absolute top-1/3 right-20 w-40 h-40 bg-pink-400/30 rounded-full blur-2xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }}></div>
+        <div className="absolute bottom-20 left-1/3 w-36 h-36 bg-cyan-400/30 rounded-full blur-2xl animate-bounce" style={{ animationDuration: '5s', animationDelay: '2s' }}></div>
+        <div className="absolute bottom-1/4 right-1/4 w-28 h-28 bg-purple-400/30 rounded-full blur-2xl animate-bounce" style={{ animationDuration: '6s', animationDelay: '0.5s' }}></div>
+      </div>
+
       {/* Demo Banner */}
       <DemoBanner />
       
@@ -161,8 +169,13 @@ export default function Home() {
       <main id="main-content" className="max-w-7xl mx-auto py-4 sm:py-6 md:py-8 px-3 sm:px-6 lg:px-8" role="main">
         <div className="space-y-4 sm:space-y-6 md:space-y-8">
               {/* Quick Actions */}
-              <div>
-                <div className="bg-white/80 backdrop-blur-sm shadow-lg shadow-indigo-100/50 rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 border border-indigo-100/50">
+              <div className="transform hover:scale-[1.02] transition-transform duration-300">
+                <div className="bg-white/95 backdrop-blur-xl shadow-[0_20px_70px_-10px_rgba(79,70,229,0.4)] rounded-2xl p-4 sm:p-5 md:p-6 border-2 border-indigo-200/50 relative overflow-hidden group hover:border-indigo-300 hover:shadow-[0_25px_80px_-15px_rgba(79,70,229,0.5)] transition-all duration-500">
+                  {/* Animated gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-100/60 via-purple-100/40 to-pink-100/60 opacity-60"></div>
+                  {/* Shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                  <div className="relative z-10">
                   <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 sm:gap-4">
                     <div className="w-full lg:w-auto">
                       <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">Quick Actions</h3>
@@ -204,13 +217,19 @@ export default function Home() {
                       </Button>
                     </div>
                   </div>
+                  </div>
                 </div>
               </div>
 
               {/* Label Filters */}
               {labels.length > 0 && (
-                <div>
-                  <div className="bg-white/80 backdrop-blur-sm shadow-lg shadow-indigo-100/50 rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-indigo-100/50">
+                <div className="transform hover:scale-[1.02] transition-transform duration-300">
+                  <div className="bg-white/95 backdrop-blur-xl shadow-[0_20px_70px_-10px_rgba(168,85,247,0.4)] rounded-2xl p-4 sm:p-5 border-2 border-purple-200/50 relative overflow-hidden group hover:border-purple-300 hover:shadow-[0_25px_80px_-15px_rgba(168,85,247,0.5)] transition-all duration-500">
+                    {/* Animated gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-100/60 via-pink-100/40 to-rose-100/60 opacity-60"></div>
+                    {/* Shine effect */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    <div className="relative z-10">
                     <div className="flex flex-col space-y-3 sm:space-y-4">
                       <div className="flex items-center gap-2">
                         <svg className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -267,6 +286,7 @@ export default function Home() {
                         </p>
                       </div>
                     )}
+                    </div>
                   </div>
                 </div>
               )}

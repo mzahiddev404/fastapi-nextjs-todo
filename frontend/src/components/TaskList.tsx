@@ -40,8 +40,14 @@ export function TaskList({
     router.push(`/tasks/${task.id}`);
   };
   return (
-    <Card className="shadow-xl shadow-indigo-100/50 border border-indigo-100/50 bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl overflow-hidden">
-      <CardHeader className="border-b border-indigo-100 bg-gradient-to-r from-indigo-50/50 to-purple-50/50 p-4 sm:p-6">
+    <div className="transform hover:scale-[1.01] transition-transform duration-300">
+    <Card className="shadow-[0_25px_80px_-15px_rgba(59,130,246,0.5)] border-2 border-blue-200/50 bg-white/95 backdrop-blur-xl rounded-2xl overflow-hidden relative group hover:border-blue-300 hover:shadow-[0_30px_90px_-15px_rgba(59,130,246,0.6)] transition-all duration-500">
+      {/* Animated gradient overlay for depth */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-100/60 via-cyan-100/40 to-indigo-100/60 opacity-60 pointer-events-none"></div>
+      {/* Shine effect */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
+      
+      <CardHeader className="border-b-2 border-blue-200/50 bg-gradient-to-r from-blue-100/80 via-cyan-100/60 to-indigo-100/80 p-4 sm:p-6 relative z-10">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
           <div className="flex-1 min-w-0">
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 truncate">
@@ -68,10 +74,10 @@ export function TaskList({
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="p-0">
+      <CardContent className="p-0 relative z-10">
         {tasks.length === 0 ? (
-          <div className="text-center py-16 px-4">
-            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center shadow-lg">
+          <div className="text-center py-16 px-4 relative">
+            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center shadow-xl shadow-indigo-200/50">
               <svg className="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
@@ -93,14 +99,18 @@ export function TaskList({
             {tasks.map((task) => (
               <div
                 key={task.id}
-                className={`p-3 sm:p-4 md:p-5 hover:bg-gradient-to-r hover:from-indigo-50/30 hover:to-purple-50/30 transition-all duration-200 ${
+                className={`p-3 sm:p-4 md:p-5 transition-all duration-500 border-l-[6px] relative group/task ${
                   task.status === 'complete' 
-                    ? 'bg-gray-50/30 opacity-75' 
-                    : 'bg-white'
+                    ? 'bg-gradient-to-r from-gray-100/60 to-slate-100/40 opacity-70 border-l-gray-400' 
+                    : 'bg-gradient-to-r from-white/80 to-blue-50/30 hover:from-indigo-50/60 hover:to-purple-50/60 border-l-transparent hover:border-l-indigo-500 hover:scale-[1.02] hover:shadow-[0_10px_40px_-10px_rgba(79,70,229,0.3)] hover:pl-6'
                 }`}
                 role="listitem"
                 aria-label={`Task: ${task.title}, Status: ${task.status}, Priority: ${task.priority}`}
               >
+                {/* Task item shine effect */}
+                {task.status !== 'complete' && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/task:translate-x-full transition-transform duration-700 pointer-events-none"></div>
+                )}
                 <div className="flex items-start justify-between gap-2 sm:gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start space-x-2 sm:space-x-3">
@@ -149,7 +159,7 @@ export function TaskList({
                         </h4>
                         
                         {task.description && (
-                          <p className="text-sm text-gray-600 mt-2 line-clamp-2 leading-relaxed">{task.description}</p>
+                          <p className="text-xs sm:text-sm text-gray-600 mt-1.5 sm:mt-2 line-clamp-2 leading-relaxed break-words">{task.description}</p>
                         )}
                         
                         <div className="flex items-center gap-2 mt-3 flex-wrap">
@@ -181,7 +191,7 @@ export function TaskList({
                                 return (
                                   <span
                                     key={labelId || index}
-                                    className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold shadow-sm"
+                                    className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold shadow-sm max-w-full"
                                     style={{
                                       backgroundColor: `${labelColor}15`,
                                       color: labelColor,
@@ -189,8 +199,8 @@ export function TaskList({
                                       borderColor: labelColor
                                     }}
                                   >
-                                    <span className="w-1.5 h-1.5 rounded-full mr-1.5" style={{ backgroundColor: labelColor }}></span>
-                                    {labelName}
+                                    <span className="w-1.5 h-1.5 rounded-full mr-1.5 flex-shrink-0" style={{ backgroundColor: labelColor }}></span>
+                                    <span className="truncate">{labelName}</span>
                                   </span>
                                 );
                               })}
@@ -237,5 +247,6 @@ export function TaskList({
         )}
       </CardContent>
     </Card>
+    </div>
   );
 }
