@@ -40,21 +40,25 @@ export function TaskList({
     router.push(`/tasks/${task.id}`);
   };
   return (
-    <Card className="shadow-sm">
-      <CardHeader className="border-b border-gray-100">
+    <Card className="shadow-xl shadow-indigo-100/50 border border-indigo-100/50 bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden">
+      <CardHeader className="border-b border-indigo-100 bg-gradient-to-r from-indigo-50/50 to-purple-50/50">
         <div className="flex justify-between items-center">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              Tasks
+            <h3 className="text-2xl font-bold text-gray-900 mb-1">
+              Your Tasks
             </h3>
-            <p className="text-sm text-gray-500 mt-1">
-              {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'} total
+            <p className="text-sm text-gray-600 flex items-center gap-2">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
+              </span>
+              <span className="text-gray-400">•</span>
+              <span>{tasks.filter(t => t.status === 'complete').length} completed</span>
             </p>
           </div>
           <Button 
             size="sm" 
             onClick={onCreateTask}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 border-0"
             aria-label="Create a new task"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,32 +70,32 @@ export function TaskList({
       </CardHeader>
       <CardContent className="p-0">
         {tasks.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="text-center py-16 px-4">
+            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center shadow-lg">
+              <svg className="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
-            <h4 className="text-lg font-medium text-gray-900 mb-2">No tasks yet</h4>
-            <p className="text-gray-500 mb-6">Get started by creating your first task</p>
+            <h4 className="text-2xl font-bold text-gray-900 mb-3">No tasks yet</h4>
+            <p className="text-gray-600 mb-8 max-w-sm mx-auto">Ready to be productive? Create your first task and start organizing your day!</p>
             <Button 
               onClick={onCreateTask}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 border-0"
             >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              Create First Task
+              Create Your First Task
             </Button>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100" role="list" aria-label="Task list">
+          <div className="divide-y divide-gray-50" role="list" aria-label="Task list">
             {tasks.map((task) => (
               <div
                 key={task.id}
-                className={`p-4 hover:bg-gray-50 transition-colors ${
+                className={`p-5 hover:bg-gradient-to-r hover:from-indigo-50/30 hover:to-purple-50/30 transition-all duration-200 ${
                   task.status === 'complete' 
-                    ? 'bg-gray-50/50' 
+                    ? 'bg-gray-50/30 opacity-75' 
                     : 'bg-white'
                 }`}
                 role="listitem"
@@ -100,23 +104,23 @@ export function TaskList({
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 mt-1">
+                      <div className="flex-shrink-0 mt-0.5">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             console.log("✅ Checkbox clicked for task:", task.id, task.title);
                             onToggleTaskStatus(task);
                           }}
-                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                          className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-200 shadow-sm ${
                             task.status === 'complete'
-                              ? 'bg-green-500 border-green-500 text-white'
-                              : 'border-gray-300 hover:border-green-400 hover:bg-green-50'
+                              ? 'bg-gradient-to-br from-emerald-500 to-teal-500 border-emerald-500 text-white shadow-emerald-200'
+                              : 'border-gray-300 hover:border-indigo-400 hover:bg-indigo-50 hover:shadow-md'
                           }`}
                           aria-label={`${task.status === "complete" ? "Mark as pending" : "Mark as complete"} task: ${task.title}`}
                           type="button"
                         >
                           {task.status === 'complete' && (
-                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
                           )}
@@ -125,9 +129,9 @@ export function TaskList({
                       
                       <div className="flex-1 min-w-0">
                         <h4 
-                          className={`font-medium cursor-pointer hover:text-blue-600 transition-colors ${
+                          className={`text-lg font-semibold cursor-pointer hover:text-indigo-600 transition-colors ${
                             task.status === 'complete' 
-                              ? 'line-through text-gray-500' 
+                              ? 'line-through text-gray-400' 
                               : 'text-gray-900'
                           }`}
                           onClick={() => handleTaskClick(task)}
@@ -145,51 +149,53 @@ export function TaskList({
                         </h4>
                         
                         {task.description && (
-                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">{task.description}</p>
+                          <p className="text-sm text-gray-600 mt-2 line-clamp-2 leading-relaxed">{task.description}</p>
                         )}
                         
-                        <div className="flex items-center space-x-3 mt-3">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        <div className="flex items-center gap-2 mt-3 flex-wrap">
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold shadow-sm ${
                             task.priority === 'high' 
-                              ? 'bg-red-100 text-red-800'
+                              ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white'
                               : task.priority === 'medium'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-green-100 text-green-800'
+                              ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-white'
+                              : 'bg-gradient-to-r from-emerald-400 to-teal-400 text-white'
                           }`}>
-                            {task.priority}
+                            <span className="w-1.5 h-1.5 rounded-full bg-white mr-1.5"></span>
+                            {task.priority.toUpperCase()}
                           </span>
                           
                           {task.deadline && (
-                            <span className="inline-flex items-center text-xs text-gray-500">
-                              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <span className="inline-flex items-center px-2.5 py-1 bg-gray-100 rounded-lg text-xs font-medium text-gray-700">
+                              <svg className="w-3.5 h-3.5 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
-                              {new Date(task.deadline).toLocaleDateString()}
+                              {new Date(task.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                             </span>
                           )}
                           
                           {task.labels && task.labels.length > 0 && (
-                            <div className="flex items-center space-x-1">
+                            <div className="flex items-center gap-1.5">
                               {task.labels.slice(0, 3).map((labelId, index) => {
                                 const labelName = getLabelName(labelId);
                                 const labelColor = getLabelColor(labelId);
                                 return (
                                   <span
                                     key={labelId || index}
-                                    className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                                    className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold shadow-sm"
                                     style={{
-                                      backgroundColor: `${labelColor}20`,
+                                      backgroundColor: `${labelColor}15`,
                                       color: labelColor,
-                                      borderWidth: '1px',
+                                      borderWidth: '1.5px',
                                       borderColor: labelColor
                                     }}
                                   >
+                                    <span className="w-1.5 h-1.5 rounded-full mr-1.5" style={{ backgroundColor: labelColor }}></span>
                                     {labelName}
                                   </span>
                                 );
                               })}
                               {task.labels.length > 3 && (
-                                <span className="text-xs text-gray-500">
+                                <span className="text-xs font-medium text-gray-500 px-2">
                                   +{task.labels.length - 3} more
                                 </span>
                               )}
@@ -200,15 +206,15 @@ export function TaskList({
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-1 ml-4" role="group" aria-label={`Actions for task: ${task.title}`}>
+                  <div className="flex items-center gap-2 ml-4" role="group" aria-label={`Actions for task: ${task.title}`}>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => onEditTask(task)}
-                      className="text-gray-400 hover:text-gray-600 p-2"
+                      className="text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 p-2.5 rounded-lg transition-all duration-200"
                       aria-label={`Edit task: ${task.title}`}
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                     </Button>
@@ -216,10 +222,10 @@ export function TaskList({
                       variant="ghost"
                       size="sm"
                       onClick={() => onDeleteTask(task)}
-                      className="text-gray-400 hover:text-red-600 p-2"
+                      className="text-gray-400 hover:text-red-600 hover:bg-red-50 p-2.5 rounded-lg transition-all duration-200"
                       aria-label={`Delete task: ${task.title}`}
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                     </Button>

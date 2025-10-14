@@ -9,6 +9,8 @@ import { GlobalLoading } from "@/components/GlobalLoading";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -17,8 +19,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "My TODO App",
-  description: "Organize your tasks and boost your productivity",
+  title: "Remember The Milk... And Everything Else",
+  description: "A beautiful, modern task management app to organize your life",
 };
 
 export default function RootLayout({
@@ -29,7 +31,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
+        className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
+        style={{ fontFamily: 'var(--font-inter)' }}
       >
         <ErrorProvider>
           <LoadingProvider>

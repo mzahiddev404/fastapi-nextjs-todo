@@ -134,7 +134,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Demo Banner */}
       <DemoBanner />
       
@@ -142,33 +142,48 @@ export default function Home() {
       {user && <DashboardHeader user={user} onLogout={handleLogout} />}
 
       {/* Main content area */}
-      <main id="main-content" className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8" role="main">
+      <main id="main-content" className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8" role="main">
         <div className="px-4 py-6 sm:px-0">
               {/* Quick Actions */}
-              <div className="mb-6">
-                <div className="bg-white shadow rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
-                    <div className="flex items-center space-x-2">
+              <div className="mb-8">
+                <div className="bg-white/80 backdrop-blur-sm shadow-lg shadow-indigo-100/50 rounded-2xl p-6 border border-indigo-100/50">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-1">Quick Actions</h3>
+                      <p className="text-sm text-gray-600">Jump to your most used features</p>
+                    </div>
+                    <div className="flex items-center gap-3 flex-wrap">
                       <Button
                         onClick={() => router.push("/tasks/status/incomplete")}
                         variant="secondary"
                         size="sm"
+                        className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200"
                       >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                         View Pending
                       </Button>
                       <Button
                         onClick={() => router.push("/tasks/status/complete")}
                         variant="secondary"
                         size="sm"
+                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200"
                       >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                         View Completed
                       </Button>
                       <Button
                         onClick={() => router.push("/profile")}
                         variant="secondary"
                         size="sm"
+                        className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200"
                       >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
                         My Profile
                       </Button>
                     </div>
