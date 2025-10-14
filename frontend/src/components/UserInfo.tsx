@@ -9,7 +9,7 @@ interface UserInfoProps {
 
 export function UserInfo({ user }: UserInfoProps) {
   return (
-    <Card className="mt-6">
+    <Card className="mt-6 opacity-90 hover:opacity-100 transition-opacity duration-300">
       <CardHeader>
         <h3 className="text-lg leading-6 font-medium text-gray-900">
           Account Information

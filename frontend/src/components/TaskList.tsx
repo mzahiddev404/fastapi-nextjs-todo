@@ -40,8 +40,8 @@ export function TaskList({
     router.push(`/tasks/${task.id}`);
   };
   return (
-    <div className="transform hover:scale-[1.01] transition-transform duration-300">
-    <Card className="shadow-[0_25px_80px_-15px_rgba(59,130,246,0.5)] border-2 border-blue-200/50 bg-white/95 backdrop-blur-xl rounded-2xl overflow-hidden relative group hover:border-blue-300 hover:shadow-[0_30px_90px_-15px_rgba(59,130,246,0.6)] transition-all duration-500">
+    <div className="transform hover:scale-[1.01] transition-transform duration-300 animate-subtle-pulse">
+    <Card className="shadow-[0_25px_80px_-15px_rgba(59,130,246,0.5)] border-2 border-blue-200/50 bg-white backdrop-blur-xl rounded-2xl overflow-hidden relative group hover:border-blue-300 hover:shadow-[0_30px_90px_-15px_rgba(59,130,246,0.6)] transition-all duration-500">
       {/* Animated gradient overlay for depth */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-100/60 via-cyan-100/40 to-indigo-100/60 opacity-60 pointer-events-none"></div>
       {/* Shine effect */}

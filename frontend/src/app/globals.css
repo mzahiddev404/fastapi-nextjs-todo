@@ -129,6 +129,21 @@
     }
   }
   
+  @keyframes subtle-pulse {
+    0%, 100% {
+      opacity: 1;
+      box-shadow: 0 25px 80px -15px rgba(59, 130, 246, 0.5);
+    }
+    50% {
+      opacity: 1;
+      box-shadow: 0 30px 90px -10px rgba(59, 130, 246, 0.65);
+    }
+  }
+  
+  .animate-subtle-pulse {
+    animation: subtle-pulse 3s ease-in-out infinite;
+  }
+  
   /* Enhanced Typography */
   h1, h2, h3, h4, h5, h6 {
     font-weight: 700;

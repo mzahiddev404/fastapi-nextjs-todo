@@ -173,8 +173,8 @@ export default function Home() {
       <main id="main-content" className="max-w-7xl mx-auto py-4 sm:py-6 md:py-8 px-3 sm:px-6 lg:px-8" role="main">
         <div className="space-y-4 sm:space-y-6 md:space-y-8">
               {/* Quick Actions */}
-              <div className="transform hover:scale-[1.02] transition-transform duration-300">
-                <div className="bg-white/95 backdrop-blur-xl shadow-[0_20px_70px_-10px_rgba(79,70,229,0.4)] rounded-2xl p-4 sm:p-5 md:p-6 border-2 border-indigo-200/50 relative overflow-hidden group hover:border-indigo-300 hover:shadow-[0_25px_80px_-15px_rgba(79,70,229,0.5)] transition-all duration-500">
+              <div className="transform hover:scale-[1.02] transition-transform duration-300 opacity-90 hover:opacity-100 transition-opacity">
+                <div className="bg-white/90 backdrop-blur-xl shadow-[0_20px_70px_-10px_rgba(79,70,229,0.4)] rounded-2xl p-4 sm:p-5 md:p-6 border-2 border-indigo-200/50 relative overflow-hidden group hover:border-indigo-300 hover:shadow-[0_25px_80px_-15px_rgba(79,70,229,0.5)] transition-all duration-500">
                   {/* Animated gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-br from-indigo-100/60 via-purple-100/40 to-pink-100/60 opacity-60"></div>
                   {/* Shine effect */}
@@ -227,8 +227,8 @@ export default function Home() {
 
               {/* Label Filters */}
               {labels.length > 0 && (
-                <div className="transform hover:scale-[1.02] transition-transform duration-300">
-                  <div className="bg-white/95 backdrop-blur-xl shadow-[0_20px_70px_-10px_rgba(168,85,247,0.4)] rounded-2xl p-4 sm:p-5 border-2 border-purple-200/50 relative overflow-hidden group hover:border-purple-300 hover:shadow-[0_25px_80px_-15px_rgba(168,85,247,0.5)] transition-all duration-500">
+                <div className="transform hover:scale-[1.02] transition-transform duration-300 opacity-90 hover:opacity-100 transition-opacity">
+                  <div className="bg-white/90 backdrop-blur-xl shadow-[0_20px_70px_-10px_rgba(168,85,247,0.4)] rounded-2xl p-4 sm:p-5 border-2 border-purple-200/50 relative overflow-hidden group hover:border-purple-300 hover:shadow-[0_25px_80px_-15px_rgba(168,85,247,0.5)] transition-all duration-500">
                     {/* Animated gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-100/60 via-pink-100/40 to-rose-100/60 opacity-60"></div>
                     {/* Shine effect */}
