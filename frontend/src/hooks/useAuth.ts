@@ -51,7 +51,7 @@ export function useAuth() {
   // Signup function
   const signup = async (username: string, email: string, password: string) => {
     try {
-      const response = await api.post("/api/v1/auth/signup", { username, email, password });
+      const response = await api.post("/api/v1/auth/signup", { name: username, email, password });
       // Token is automatically stored by the API client
       mutate(); // Revalidate user data
       return response;

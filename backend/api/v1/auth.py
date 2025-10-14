@@ -136,3 +136,66 @@ async def get_current_user_info(current_user: dict = Depends(get_current_active_
 async def logout():
     """Logout user (token invalidation should be handled on client side)"""
     return {"message": "Successfully logged out"}
+
+
+@router.post("/signup", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
+async def signup(user_data: UserCreate):
+    """Sign up a new user (alias for /register)"""
+    return await register(user_data)
+
+
+@router.post("/demo", response_model=AuthResponse)
+async def demo_login():
+    """Login with demo account"""
+    db = await get_database()
+    
+    # Demo account credentials
+    demo_email = "demo@example.com"
+    demo_password = "demo123"
+    demo_name = "Demo User"
+    
+    # Check if demo user exists
+    user = await db.users.find_one({"email": demo_email})
+    
+    # If demo user doesn't exist, create it
+    if not user:
+        from datetime import datetime
+        user_dict = {
+            "email": demo_email,
+            "name": demo_name,
+            "hashed_password": get_password_hash(demo_password),
+            "is_active": True,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        result = await db.users.insert_one(user_dict)
+        user = await db.users.find_one({"_id": result.inserted_id})
+    
+    # Convert ObjectId to string for response
+    user["_id"] = str(user["_id"])
+    
+    # Create access token
+    access_token_expires = timedelta(minutes=settings.jwt_expire_minutes)
+    access_token = create_access_token(
+        data={"sub": user["email"]},
+        expires_delta=access_token_expires
+    )
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": user
+    }
+
+
+@router.post("/refresh", response_model=Token)
+async def refresh_token(current_user: dict = Depends(get_current_active_user)):
+    """Refresh access token for authenticated user"""
+    # Create new access token
+    access_token_expires = timedelta(minutes=settings.jwt_expire_minutes)
+    access_token = create_access_token(
+        data={"sub": current_user["email"]},
+        expires_delta=access_token_expires
+    )
+    
+    return {"access_token": access_token, "token_type": "bearer"}

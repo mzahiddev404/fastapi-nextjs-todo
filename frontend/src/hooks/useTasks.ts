@@ -3,8 +3,17 @@ import useSWR, { mutate } from "swr";
 import { Task, TaskCreate, TaskUpdate, TaskStats } from "@/types";
 import { api } from "@/lib/apiClient";
 
+// Response type from backend for task list
+interface TaskListResponse {
+  tasks: Task[];
+  total: number;
+}
+
 // Fetcher function for SWR
-const fetcher = (url: string) => api.get<Task[]>(url);
+const fetcher = async (url: string): Promise<Task[]> => {
+  const response = await api.get<TaskListResponse>(url);
+  return response.tasks; // Extract tasks array from response
+};
 
 export function useTasks() {
   // Fetch all tasks
