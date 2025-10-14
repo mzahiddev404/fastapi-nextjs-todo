@@ -15,39 +15,36 @@ export default function LoginPage() {
   const router = useRouter();
   const { login, startDemo } = useAuth();
 
+  // Handle user login submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
     try {
-      console.log("Attempting login with:", email);
       const result = await login(email, password);
-      console.log("Login successful:", result);
-      // Small delay to ensure token is stored before redirect
+      // Small delay to ensure token is stored in localStorage before redirect
       await new Promise(resolve => setTimeout(resolve, 100));
       router.push("/");
     } catch (err) {
-      console.error("Login error:", err);
       const errorMessage = err instanceof Error ? err.message : "Login failed. Please try again.";
-      console.error("Error message:", errorMessage);
       setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Handle demo account login
   const handleDemo = async () => {
     setIsLoading(true);
     setError("");
 
     try {
       await startDemo();
-      // Small delay to ensure token is stored before redirect
+      // Small delay to ensure token is stored in localStorage before redirect
       await new Promise(resolve => setTimeout(resolve, 100));
       router.push("/");
     } catch (err) {
-      console.error("Demo error:", err);
       setError(err instanceof Error ? err.message : "Demo failed. Please try again.");
     } finally {
       setIsLoading(false);

@@ -117,8 +117,7 @@ export function TaskList({
                       <div className="flex-shrink-0 mt-0.5 sm:mt-1">
                         <button
                           onClick={(e) => {
-                            e.stopPropagation();
-                            console.log("✅ Checkbox clicked for task:", task.id, task.title);
+                            e.stopPropagation(); // Prevent task detail navigation
                             onToggleTaskStatus(task);
                           }}
                           className={`w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg border-2 flex items-center justify-center transition-all duration-200 shadow-sm ${

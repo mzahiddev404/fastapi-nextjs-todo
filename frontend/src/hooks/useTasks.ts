@@ -49,16 +49,14 @@ export function useTasks() {
     }
   };
 
-  // Update task status
+  // Update task status (marks task as complete or incomplete)
   const updateTaskStatus = async (taskId: string, status: "incomplete" | "complete") => {
     try {
-      console.log("📡 API Call: PATCH /api/v1/tasks/" + taskId + "/status", { status });
       const updatedTask = await api.patch<Task>(`/api/v1/tasks/${taskId}/status`, { status });
-      console.log("📥 API Response:", updatedTask);
-      mutate(); // Revalidate tasks list
+      mutate(); // Revalidate tasks list from server
       return updatedTask;
     } catch (error) {
-      console.error("📡 API Error:", error);
+      console.error("Error updating task status:", error);
       throw error;
     }
   };

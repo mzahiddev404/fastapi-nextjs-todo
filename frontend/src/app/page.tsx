@@ -56,6 +56,15 @@ export default function Home() {
   };
 
   // Show loading while checking authentication or during SSR
+  // If there's an auth error and we have a token, clear it and redirect to login
+  if (isMounted && authError && hasToken) {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('todo_token');
+    }
+    router.push("/auth/login");
+    return null;
+  }
+
   if (!isMounted || authLoading || (hasToken && !user && !authError)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -99,14 +108,13 @@ export default function Home() {
     setShowTaskForm(true);
   };
 
+  // Handle task status toggle (checkbox) - marks task as complete or incomplete
   const handleToggleTaskStatus = async (task: Task) => {
     try {
-      console.log("🔄 Toggling task status:", task.id, "from", task.status, "to", task.status === "complete" ? "incomplete" : "complete");
       const newStatus = task.status === "complete" ? "incomplete" : "complete";
       await updateTaskStatus(task.id, newStatus);
-      console.log("✅ Task status updated successfully");
     } catch (error) {
-      console.error("❌ Failed to update task status:", error);
+      console.error("Failed to update task status:", error);
       alert("Failed to update task status. Please try again.");
     }
   };
