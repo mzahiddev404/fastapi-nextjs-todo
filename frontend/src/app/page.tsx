@@ -158,49 +158,49 @@ export default function Home() {
       {user && <DashboardHeader user={user} onLogout={handleLogout} />}
 
       {/* Main content area */}
-      <main id="main-content" className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8" role="main">
-        <div className="px-4 py-6 sm:px-0">
+      <main id="main-content" className="max-w-7xl mx-auto py-4 sm:py-6 md:py-8 px-3 sm:px-6 lg:px-8" role="main">
+        <div className="space-y-4 sm:space-y-6 md:space-y-8">
               {/* Quick Actions */}
-              <div className="mb-8">
-                <div className="bg-white/80 backdrop-blur-sm shadow-lg shadow-indigo-100/50 rounded-2xl p-6 border border-indigo-100/50">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-1">Quick Actions</h3>
-                      <p className="text-sm text-gray-600">Jump to your most used features</p>
+              <div>
+                <div className="bg-white/80 backdrop-blur-sm shadow-lg shadow-indigo-100/50 rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 border border-indigo-100/50">
+                  <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 sm:gap-4">
+                    <div className="w-full lg:w-auto">
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">Quick Actions</h3>
+                      <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Jump to your most used features</p>
                     </div>
-                    <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-wrap w-full lg:w-auto">
                       <Button
                         onClick={() => router.push("/tasks/status/incomplete")}
                         variant="secondary"
                         size="sm"
-                        className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200"
+                        className="flex-1 sm:flex-none bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200 text-xs sm:text-sm"
                       >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        View Pending
+                        <span className="hidden xs:inline">View </span>Pending
                       </Button>
                       <Button
                         onClick={() => router.push("/tasks/status/complete")}
                         variant="secondary"
                         size="sm"
-                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200"
+                        className="flex-1 sm:flex-none bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200 text-xs sm:text-sm"
                       >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        View Completed
+                        <span className="hidden xs:inline">View </span>Complete
                       </Button>
                       <Button
                         onClick={() => router.push("/profile")}
                         variant="secondary"
                         size="sm"
-                        className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200"
+                        className="flex-1 sm:flex-none bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200 text-xs sm:text-sm"
                       >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
-                        My Profile
+                        Profile
                       </Button>
                     </div>
                   </div>
@@ -209,26 +209,26 @@ export default function Home() {
 
               {/* Label Filters */}
               {labels.length > 0 && (
-                <div className="mb-6">
-                  <div className="bg-white/80 backdrop-blur-sm shadow-lg shadow-indigo-100/50 rounded-2xl p-5 border border-indigo-100/50">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div>
+                  <div className="bg-white/80 backdrop-blur-sm shadow-lg shadow-indigo-100/50 rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-indigo-100/50">
+                    <div className="flex flex-col space-y-3 sm:space-y-4">
                       <div className="flex items-center gap-2">
-                        <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                         </svg>
-                        <h3 className="text-base font-semibold text-gray-900">Filter by Label</h3>
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900">Filter by Label</h3>
                       </div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <button
                           onClick={() => setSelectedLabelFilter(null)}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
                             selectedLabelFilter === null
                               ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
                         >
-                          All Tasks
-                          <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs bg-white/20">
+                          <span className="hidden xs:inline">All </span>Tasks
+                          <span className="ml-1.5 sm:ml-2 inline-flex items-center justify-center px-1.5 sm:px-2 py-0.5 rounded-full text-xs bg-white/20">
                             {tasks.length}
                           </span>
                         </button>
@@ -236,7 +236,7 @@ export default function Home() {
                           <button
                             key={label.id}
                             onClick={() => setSelectedLabelFilter(label.id)}
-                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 ${
                               selectedLabelFilter === label.id
                                 ? 'shadow-lg scale-105'
                                 : 'hover:scale-105 shadow-sm'
@@ -248,9 +248,9 @@ export default function Home() {
                               borderColor: label.color,
                             }}
                           >
-                            <span className="w-2 h-2 rounded-full inline-block mr-2" style={{ backgroundColor: selectedLabelFilter === label.id ? '#fff' : label.color }}></span>
+                            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full inline-block mr-1.5 sm:mr-2" style={{ backgroundColor: selectedLabelFilter === label.id ? '#fff' : label.color }}></span>
                             {label.name}
-                            <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs" style={{ backgroundColor: selectedLabelFilter === label.id ? 'rgba(255,255,255,0.3)' : `${label.color}30` }}>
+                            <span className="ml-1.5 sm:ml-2 inline-flex items-center justify-center px-1.5 sm:px-2 py-0.5 rounded-full text-xs" style={{ backgroundColor: selectedLabelFilter === label.id ? 'rgba(255,255,255,0.3)' : `${label.color}30` }}>
                               {tasks.filter(t => t.labels && t.labels.includes(label.id)).length}
                             </span>
                           </button>
@@ -259,8 +259,8 @@ export default function Home() {
                     </div>
                     {selectedLabelFilter && (
                       <div className="mt-3 pt-3 border-t border-gray-200">
-                        <p className="text-sm text-gray-600">
-                          Showing <span className="font-semibold text-gray-900">{filteredTasks.length}</span> task{filteredTasks.length !== 1 ? 's' : ''} with label{' '}
+                        <p className="text-xs sm:text-sm text-gray-600">
+                          Showing <span className="font-semibold text-gray-900">{filteredTasks.length}</span> task{filteredTasks.length !== 1 ? 's' : ''} with{' '}
                           <span className="font-semibold" style={{ color: getLabelById(selectedLabelFilter)?.color }}>
                             {getLabelById(selectedLabelFilter)?.name}
                           </span>

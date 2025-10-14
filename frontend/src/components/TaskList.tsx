@@ -40,25 +40,25 @@ export function TaskList({
     router.push(`/tasks/${task.id}`);
   };
   return (
-    <Card className="shadow-xl shadow-indigo-100/50 border border-indigo-100/50 bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden">
-      <CardHeader className="border-b border-indigo-100 bg-gradient-to-r from-indigo-50/50 to-purple-50/50">
-        <div className="flex justify-between items-center">
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-1">
+    <Card className="shadow-xl shadow-indigo-100/50 border border-indigo-100/50 bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl overflow-hidden">
+      <CardHeader className="border-b border-indigo-100 bg-gradient-to-r from-indigo-50/50 to-purple-50/50 p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 truncate">
               Your Tasks
             </h3>
-            <p className="text-sm text-gray-600 flex items-center gap-2">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
                 {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
               </span>
-              <span className="text-gray-400">•</span>
-              <span>{tasks.filter(t => t.status === 'complete').length} completed</span>
-            </p>
+              <span className="text-gray-400 hidden xs:inline">•</span>
+              <span className="text-xs sm:text-sm text-gray-600 hidden xs:inline">{tasks.filter(t => t.status === 'complete').length} completed</span>
+            </div>
           </div>
           <Button 
             size="sm" 
             onClick={onCreateTask}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 border-0"
+            className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 border-0 text-sm"
             aria-label="Create a new task"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,7 +93,7 @@ export function TaskList({
             {tasks.map((task) => (
               <div
                 key={task.id}
-                className={`p-5 hover:bg-gradient-to-r hover:from-indigo-50/30 hover:to-purple-50/30 transition-all duration-200 ${
+                className={`p-3 sm:p-4 md:p-5 hover:bg-gradient-to-r hover:from-indigo-50/30 hover:to-purple-50/30 transition-all duration-200 ${
                   task.status === 'complete' 
                     ? 'bg-gray-50/30 opacity-75' 
                     : 'bg-white'
@@ -101,17 +101,17 @@ export function TaskList({
                 role="listitem"
                 aria-label={`Task: ${task.title}, Status: ${task.status}, Priority: ${task.priority}`}
               >
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-2 sm:gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 mt-0.5">
+                    <div className="flex items-start space-x-2 sm:space-x-3">
+                      <div className="flex-shrink-0 mt-0.5 sm:mt-1">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             console.log("✅ Checkbox clicked for task:", task.id, task.title);
                             onToggleTaskStatus(task);
                           }}
-                          className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-200 shadow-sm ${
+                          className={`w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg border-2 flex items-center justify-center transition-all duration-200 shadow-sm ${
                             task.status === 'complete'
                               ? 'bg-gradient-to-br from-emerald-500 to-teal-500 border-emerald-500 text-white shadow-emerald-200'
                               : 'border-gray-300 hover:border-indigo-400 hover:bg-indigo-50 hover:shadow-md'
@@ -120,7 +120,7 @@ export function TaskList({
                           type="button"
                         >
                           {task.status === 'complete' && (
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
                           )}
@@ -129,7 +129,7 @@ export function TaskList({
                       
                       <div className="flex-1 min-w-0">
                         <h4 
-                          className={`text-lg font-semibold cursor-pointer hover:text-indigo-600 transition-colors ${
+                          className={`text-base sm:text-lg font-semibold cursor-pointer hover:text-indigo-600 transition-colors break-words ${
                             task.status === 'complete' 
                               ? 'line-through text-gray-400' 
                               : 'text-gray-900'
