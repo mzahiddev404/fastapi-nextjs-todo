@@ -227,6 +227,75 @@ async def update_task(
     return updated_task
 
 
+@router.patch("/{task_id}/status", response_model=TaskResponse)
+async def update_task_status(
+    task_id: str,
+    status_data: dict,
+    current_user: dict = Depends(get_current_active_user)
+):
+    """
+    Update only the status of a task (quick toggle between incomplete/complete)
+    
+    Args:
+        task_id: The task ID
+        status_data: Dictionary containing the new status {"status": "complete" or "incomplete"}
+        current_user: Current authenticated user
+    
+    Returns:
+        Updated task with new status
+    """
+    if not ObjectId.is_valid(task_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid task ID"
+        )
+    
+    db = await get_database()
+    
+    # Verify task exists and belongs to user
+    task = await db.tasks.find_one({
+        "_id": ObjectId(task_id),
+        "user_id": current_user["_id"]
+    })
+    
+    if not task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Task not found"
+        )
+    
+    # Get new status from request
+    new_status = status_data.get("status")
+    
+    # Validate status value
+    if new_status not in [TaskStatus.INCOMPLETE, TaskStatus.COMPLETE]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid status value. Must be 'incomplete' or 'complete'"
+        )
+    
+    # Update task status
+    update_data = {
+        "status": new_status,
+        "updated_at": datetime.utcnow()
+    }
+    
+    await db.tasks.update_one(
+        {"_id": ObjectId(task_id)},
+        {"$set": update_data}
+    )
+    
+    # Get updated task
+    updated_task = await db.tasks.find_one({"_id": ObjectId(task_id)})
+    
+    # Convert ObjectIds to strings
+    updated_task["_id"] = str(updated_task["_id"])
+    updated_task["user_id"] = str(updated_task["user_id"])
+    updated_task["labels"] = [str(label_id) for label_id in updated_task["labels"]]
+    
+    return updated_task
+
+
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_task(
     task_id: str,
