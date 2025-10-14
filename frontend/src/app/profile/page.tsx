@@ -238,70 +238,48 @@ export default function ProfilePage() {
     : 0;
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Floating particles background */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-yellow-400/30 rounded-full blur-2xl animate-bounce" style={{ animationDuration: '3s' }}></div>
-        <div className="absolute top-1/3 right-20 w-40 h-40 bg-pink-400/30 rounded-full blur-2xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }}></div>
-        <div className="absolute bottom-20 left-1/3 w-36 h-36 bg-cyan-400/30 rounded-full blur-2xl animate-bounce" style={{ animationDuration: '5s', animationDelay: '2s' }}></div>
-        <div className="absolute bottom-1/4 right-1/4 w-28 h-28 bg-purple-400/30 rounded-full blur-2xl animate-bounce" style={{ animationDuration: '6s', animationDelay: '0.5s' }}></div>
-      </div>
-
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white/95 backdrop-blur-xl border-b-2 border-indigo-200/50 shadow-[0_10px_40px_-10px_rgba(79,70,229,0.3)] relative overflow-hidden group">
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-50/80 via-purple-50/60 to-pink-50/80 opacity-70"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1500"></div>
-        
-        <div className="max-w-7xl mx-auto py-4 sm:py-5 px-3 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 sm:gap-3">
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
               <Button
                 variant="secondary"
                 onClick={() => router.push("/")}
-                className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-semibold px-2.5 sm:px-4"
+                className="flex items-center space-x-2"
               >
-                <svg className="w-4 h-4 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                <span className="hidden sm:inline">Back</span>
+                <span>Back to Dashboard</span>
               </Button>
-              <h1 className="text-lg sm:text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">My Profile</h1>
+              <h1 className="text-xl font-semibold text-gray-900">Profile</h1>
             </div>
           </div>
         </div>
       </header>
 
       {/* Main content */}
-      <main className="max-w-5xl mx-auto py-4 sm:py-6 md:py-8 px-3 sm:px-6 lg:px-8">
-        <div className="space-y-4 sm:space-y-6">
+      <main className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-6 sm:px-0">
+          <div className="space-y-6">
             {/* Profile Information */}
-            <div className="transform hover:scale-[1.01] transition-transform duration-300">
-              <div className="bg-white/95 backdrop-blur-xl shadow-[0_25px_80px_-15px_rgba(79,70,229,0.5)] border-2 border-indigo-200/50 rounded-2xl overflow-hidden relative group hover:border-indigo-300 hover:shadow-[0_30px_90px_-15px_rgba(79,70,229,0.6)] transition-all duration-500">
-                {/* Animated gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-100/60 via-purple-100/40 to-pink-100/60 opacity-60 pointer-events-none"></div>
-                {/* Shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
-                
-                <div className="border-b-2 border-indigo-200/50 bg-gradient-to-r from-indigo-100/80 via-purple-100/60 to-pink-100/80 p-4 sm:p-6 relative z-10">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <h2 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
-                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      Profile Information
-                    </h2>
-                    <Button
-                      onClick={() => setIsEditing(!isEditing)}
-                      variant="secondary"
-                      size="sm"
-                      className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-semibold"
-                    >
-                      {isEditing ? "Cancel" : "Edit"}
-                    </Button>
-                  </div>
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-medium text-gray-900">Profile Information</h2>
+                  <Button
+                    onClick={() => setIsEditing(!isEditing)}
+                    variant="secondary"
+                    size="sm"
+                  >
+                    {isEditing ? "Cancel" : "Edit"}
+                  </Button>
                 </div>
+              </div>
 
-                <div className="p-4 sm:p-6 relative z-10">
+              <div className="px-6 py-4">
                 {successMessage && (
                   <Alert variant="success" className="mb-4">
                     {successMessage}
@@ -400,44 +378,31 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 )}
-                </div>
               </div>
             </div>
 
             {/* Change Password */}
-            <div className="transform hover:scale-[1.01] transition-transform duration-300">
-              <div className="bg-white/95 backdrop-blur-xl shadow-[0_25px_80px_-15px_rgba(168,85,247,0.5)] border-2 border-purple-200/50 rounded-2xl overflow-hidden relative group hover:border-purple-300 hover:shadow-[0_30px_90px_-15px_rgba(168,85,247,0.6)] transition-all duration-500">
-                {/* Animated gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-100/60 via-pink-100/40 to-rose-100/60 opacity-60 pointer-events-none"></div>
-                {/* Shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
-                
-                <div className="border-b-2 border-purple-200/50 bg-gradient-to-r from-purple-100/80 via-pink-100/60 to-rose-100/80 p-4 sm:p-6 relative z-10">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <h2 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
-                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-medium text-gray-900">Change Password</h2>
+                  {!isChangingPassword && (
+                    <Button
+                      onClick={() => {
+                        setIsChangingPassword(true);
+                        setSaveError("");
+                        setSuccessMessage("");
+                      }}
+                      variant="secondary"
+                      size="sm"
+                    >
                       Change Password
-                    </h2>
-                    {!isChangingPassword && (
-                      <Button
-                        onClick={() => {
-                          setIsChangingPassword(true);
-                          setSaveError("");
-                          setSuccessMessage("");
-                        }}
-                        variant="secondary"
-                        size="sm"
-                        className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-semibold"
-                      >
-                        Change Password
-                      </Button>
-                    )}
-                  </div>
+                    </Button>
+                  )}
                 </div>
+              </div>
 
-                <div className="p-4 sm:p-6 relative z-10">
+              <div className="px-6 py-4">
                 {isChangingPassword ? (
                   <form onSubmit={handlePasswordChange} className="space-y-4">
                     <div>
@@ -516,28 +481,16 @@ export default function ProfilePage() {
                     Click "Change Password" to update your password securely.
                   </p>
                 )}
-                </div>
               </div>
             </div>
 
             {/* Task Statistics */}
-            <div className="transform hover:scale-[1.01] transition-transform duration-300">
-              <div className="bg-white/95 backdrop-blur-xl shadow-[0_25px_80px_-15px_rgba(59,130,246,0.5)] border-2 border-blue-200/50 rounded-2xl overflow-hidden relative group hover:border-blue-300 hover:shadow-[0_30px_90px_-15px_rgba(59,130,246,0.6)] transition-all duration-500">
-                {/* Animated gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-100/60 via-cyan-100/40 to-indigo-100/60 opacity-60 pointer-events-none"></div>
-                {/* Shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
-                
-                <div className="border-b-2 border-blue-200/50 bg-gradient-to-r from-blue-100/80 via-cyan-100/60 to-indigo-100/80 p-4 sm:p-6 relative z-10">
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                    Task Statistics
-                  </h2>
-                </div>
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-medium text-gray-900">Task Statistics</h2>
+              </div>
 
-                <div className="p-4 sm:p-6 relative z-10">
+              <div className="px-6 py-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-900">{taskStats.total}</div>
@@ -572,72 +525,48 @@ export default function ProfilePage() {
                     ></div>
                   </div>
                 </div>
-                </div>
               </div>
             </div>
 
             {/* Quick Actions */}
-            <div className="transform hover:scale-[1.01] transition-transform duration-300">
-              <div className="bg-white/95 backdrop-blur-xl shadow-[0_25px_80px_-15px_rgba(16,185,129,0.5)] border-2 border-emerald-200/50 rounded-2xl overflow-hidden relative group hover:border-emerald-300 hover:shadow-[0_30px_90px_-15px_rgba(16,185,129,0.6)] transition-all duration-500">
-                {/* Animated gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-100/60 via-teal-100/40 to-cyan-100/60 opacity-60 pointer-events-none"></div>
-                {/* Shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
-                
-                <div className="border-b-2 border-emerald-200/50 bg-gradient-to-r from-emerald-100/80 via-teal-100/60 to-cyan-100/80 p-4 sm:p-6 relative z-10">
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    Quick Actions
-                  </h2>
-                </div>
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-medium text-gray-900">Quick Actions</h2>
+              </div>
 
-                <div className="p-4 sm:p-6 relative z-10">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="px-6 py-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Button
                     onClick={() => router.push("/")}
-                    className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-semibold"
+                    
+                    className="w-full"
                   >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
                     View All Tasks
                   </Button>
                   
                   <Button
-                    onClick={() => router.push("/tasks/status/incomplete")}
+                    onClick={() => router.push("/tasks/status/pending")}
                     variant="secondary"
-                    className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-semibold"
+                    className="w-full"
                   >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
                     View Pending Tasks
                   </Button>
                   
                   <Button
-                    onClick={() => router.push("/tasks/status/complete")}
+                    onClick={() => router.push("/tasks/status/completed")}
                     variant="secondary"
-                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-semibold"
+                    className="w-full"
                   >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
                     View Completed Tasks
                   </Button>
                   
                   <Button
                     onClick={() => router.push("/")}
                     variant="secondary"
-                    className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-semibold"
+                    className="w-full"
                   >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
                     Create New Task
                   </Button>
-                </div>
                 </div>
               </div>
             </div>
