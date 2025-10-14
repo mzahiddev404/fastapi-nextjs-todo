@@ -62,13 +62,14 @@ export function DashboardHeader({ user, onLogout }: DashboardHeaderProps) {
                 onClick={() => router.push("/profile")}
                 variant="ghost"
                 size="sm"
-                className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-semibold px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm whitespace-nowrap"
+                className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-semibold px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm flex items-center gap-1.5"
                 aria-label="View your profile"
               >
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span className="hidden sm:inline">Profile</span>
+                <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+                  {(user?.name || user?.email || "U").charAt(0).toUpperCase()}
+                </div>
+                <span className="hidden sm:inline truncate max-w-[100px]">{user?.name || user?.email?.split('@')[0] || "Profile"}</span>
+                <span className="inline sm:hidden">Profile</span>
               </Button>
               <Button
                 onClick={onLogout}
