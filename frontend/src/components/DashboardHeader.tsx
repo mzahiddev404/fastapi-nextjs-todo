@@ -24,7 +24,7 @@ export function DashboardHeader({ user, onLogout }: DashboardHeaderProps) {
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">TaskFlow</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Remember The Milk... And Everything Else</h1>
                 <p className="text-sm text-gray-500">Productivity Management</p>
               </div>
             </div>
