@@ -14,10 +14,21 @@ interface TaskFormProps {
 }
 
 export function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
+  // Convert ISO date to YYYY-MM-DD format for date input
+  const formatDateForInput = (dateString?: string) => {
+    if (!dateString) return "";
+    try {
+      const date = new Date(dateString);
+      return date.toISOString().split('T')[0];
+    } catch {
+      return "";
+    }
+  };
+
   const [title, setTitle] = useState(task?.title || "");
   const [description, setDescription] = useState(task?.description || "");
   const [priority, setPriority] = useState<"low" | "medium" | "high">(task?.priority || "medium");
-  const [dueDate, setDueDate] = useState(task?.deadline || "");
+  const [dueDate, setDueDate] = useState(formatDateForInput(task?.deadline));
   const [selectedLabels, setSelectedLabels] = useState<string[]>(task?.labels || []);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -33,11 +44,14 @@ export function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
     setError("");
 
     try {
+      // Convert date to ISO format for backend
+      const deadlineISO = dueDate ? new Date(dueDate).toISOString() : new Date().toISOString();
+      
       const taskData: TaskCreate | TaskUpdate = {
         title,
         description: description || undefined,
         priority,
-        deadline: dueDate,  // Required field
+        deadline: deadlineISO,  // Required field in ISO format
         labels: selectedLabels.length > 0 ? selectedLabels : undefined,
       };
 
@@ -113,13 +127,14 @@ export function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Due Date
+                Due Date <span className="text-red-500">*</span>
               </label>
               <input
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
                 className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                required
               />
             </div>
           </div>

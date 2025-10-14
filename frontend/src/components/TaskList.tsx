@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardContent, Button } from "@/components/ui";
 import { Task } from "@/types";
+import { useLabels } from "@/hooks/useLabels";
 
 interface TaskListProps {
   tasks: Task[];
@@ -20,6 +21,19 @@ export function TaskList({
   onCreateTask 
 }: TaskListProps) {
   const router = useRouter();
+  const { labels } = useLabels();
+
+  // Helper function to get label name by ID
+  const getLabelName = (labelId: string) => {
+    const label = labels.find(l => l.id === labelId);
+    return label ? label.name : labelId;
+  };
+
+  // Helper function to get label color by ID  
+  const getLabelColor = (labelId: string) => {
+    const label = labels.find(l => l.id === labelId);
+    return label ? label.color : "#3B82F6";
+  };
 
   // Handle task title click to navigate to detail page
   const handleTaskClick = (task: Task) => {
@@ -88,13 +102,18 @@ export function TaskList({
                     <div className="flex items-start space-x-3">
                       <div className="flex-shrink-0 mt-1">
                         <button
-                          onClick={() => onToggleTaskStatus(task)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            console.log("✅ Checkbox clicked for task:", task.id, task.title);
+                            onToggleTaskStatus(task);
+                          }}
                           className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                             task.status === 'complete'
                               ? 'bg-green-500 border-green-500 text-white'
-                              : 'border-gray-300 hover:border-green-400'
+                              : 'border-gray-300 hover:border-green-400 hover:bg-green-50'
                           }`}
                           aria-label={`${task.status === "complete" ? "Mark as pending" : "Mark as complete"} task: ${task.title}`}
+                          type="button"
                         >
                           {task.status === 'complete' && (
                             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -151,14 +170,24 @@ export function TaskList({
                           
                           {task.labels && task.labels.length > 0 && (
                             <div className="flex items-center space-x-1">
-                              {task.labels.slice(0, 3).map((label, index) => (
-                                <span
-                                  key={index}
-                                  className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
-                                >
-                                  {label}
-                                </span>
-                              ))}
+                              {task.labels.slice(0, 3).map((labelId, index) => {
+                                const labelName = getLabelName(labelId);
+                                const labelColor = getLabelColor(labelId);
+                                return (
+                                  <span
+                                    key={labelId || index}
+                                    className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                                    style={{
+                                      backgroundColor: `${labelColor}20`,
+                                      color: labelColor,
+                                      borderWidth: '1px',
+                                      borderColor: labelColor
+                                    }}
+                                  >
+                                    {labelName}
+                                  </span>
+                                );
+                              })}
                               {task.labels.length > 3 && (
                                 <span className="text-xs text-gray-500">
                                   +{task.labels.length - 3} more

@@ -52,10 +52,13 @@ export function useTasks() {
   // Update task status
   const updateTaskStatus = async (taskId: string, status: "incomplete" | "complete") => {
     try {
+      console.log("📡 API Call: PATCH /api/v1/tasks/" + taskId + "/status", { status });
       const updatedTask = await api.patch<Task>(`/api/v1/tasks/${taskId}/status`, { status });
+      console.log("📥 API Response:", updatedTask);
       mutate(); // Revalidate tasks list
       return updatedTask;
     } catch (error) {
+      console.error("📡 API Error:", error);
       throw error;
     }
   };

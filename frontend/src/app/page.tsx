@@ -20,20 +20,27 @@ export default function Home() {
   const { tasks, isLoading: tasksLoading, error: tasksError, updateTaskStatus, deleteTask } = useTasks();
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const [hasToken, setHasToken] = useState(false);
+
+  // Check if component is mounted and if token exists (client-side only)
+  useEffect(() => {
+    setIsMounted(true);
+    if (typeof window !== 'undefined') {
+      setHasToken(!!localStorage.getItem('todo_token'));
+    }
+  }, []);
 
   // Redirect to login if not authenticated
   useEffect(() => {
     // Only redirect if we're done loading AND there's no user AND no token
-    const hasToken = typeof window !== 'undefined' && localStorage.getItem('todo_token');
-    if (!authLoading && !isAuthenticated && !hasToken) {
+    if (isMounted && !authLoading && !isAuthenticated && !hasToken) {
       router.push("/auth/login");
     }
-  }, [authLoading, isAuthenticated, router]);
+  }, [isMounted, authLoading, isAuthenticated, hasToken, router]);
 
-  // Show loading while checking authentication
-  const hasToken = typeof window !== 'undefined' && localStorage.getItem('todo_token');
-  
-  if (authLoading || (hasToken && !user && !authError)) {
+  // Show loading while checking authentication or during SSR
+  if (!isMounted || authLoading || (hasToken && !user && !authError)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -49,7 +56,7 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <LoadingSpinner size="lg" text="Redirecting to login..." />
+          <LoadingSpinner size="lg" text="Loading..." />
           <p className="mt-4 text-gray-600">Please sign in to continue</p>
         </div>
       </div>
@@ -78,9 +85,13 @@ export default function Home() {
 
   const handleToggleTaskStatus = async (task: Task) => {
     try {
-      await updateTaskStatus(task.id, task.status === "complete" ? "incomplete" : "complete");
+      console.log("🔄 Toggling task status:", task.id, "from", task.status, "to", task.status === "complete" ? "incomplete" : "complete");
+      const newStatus = task.status === "complete" ? "incomplete" : "complete";
+      await updateTaskStatus(task.id, newStatus);
+      console.log("✅ Task status updated successfully");
     } catch (error) {
-      console.error("Failed to update task status:", error);
+      console.error("❌ Failed to update task status:", error);
+      alert("Failed to update task status. Please try again.");
     }
   };
 
@@ -140,14 +151,14 @@ export default function Home() {
                     <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
                     <div className="flex items-center space-x-2">
                       <Button
-                        onClick={() => router.push("/tasks/status/pending")}
+                        onClick={() => router.push("/tasks/status/incomplete")}
                         variant="secondary"
                         size="sm"
                       >
                         View Pending
                       </Button>
                       <Button
-                        onClick={() => router.push("/tasks/status/completed")}
+                        onClick={() => router.push("/tasks/status/complete")}
                         variant="secondary"
                         size="sm"
                       >

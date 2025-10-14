@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from bson import ObjectId
@@ -16,9 +16,38 @@ from schemas.user import UserCreate, UserResponse, UserLogin, Token, AuthRespons
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
+async def create_default_labels(db, user_id: ObjectId):
+    """
+    Create default labels (Personal and Work) for a new user.
+    
+    Args:
+        db: Database connection
+        user_id: The user's ObjectId
+    """
+    default_labels = [
+        {
+            "user_id": user_id,
+            "name": "Personal",
+            "color": "#3B82F6",  # Blue
+            "created_at": datetime.utcnow()
+        },
+        {
+            "user_id": user_id,
+            "name": "Work",
+            "color": "#EF4444",  # Red
+            "created_at": datetime.utcnow()
+        }
+    ]
+    
+    # Check if labels already exist to avoid duplicates
+    existing_labels = await db.labels.find_one({"user_id": user_id})
+    if not existing_labels:
+        await db.labels.insert_many(default_labels)
+
+
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
 async def register(user_data: UserCreate):
-    """Register a new user"""
+    """Register a new user and create default labels"""
     db = await get_database()
     
     # Check if user already exists
@@ -30,7 +59,6 @@ async def register(user_data: UserCreate):
         )
     
     # Create new user
-    from datetime import datetime
     user_dict = {
         "email": user_data.email,
         "name": user_data.name,
@@ -42,6 +70,9 @@ async def register(user_data: UserCreate):
     
     result = await db.users.insert_one(user_dict)
     created_user = await db.users.find_one({"_id": result.inserted_id})
+    
+    # Create default labels for the new user
+    await create_default_labels(db, created_user["_id"])
     
     # Convert ObjectId to string for response
     created_user["_id"] = str(created_user["_id"])
@@ -146,7 +177,7 @@ async def signup(user_data: UserCreate):
 
 @router.post("/demo", response_model=AuthResponse)
 async def demo_login():
-    """Login with demo account"""
+    """Login with demo account and create default labels if needed"""
     db = await get_database()
     
     # Demo account credentials
@@ -159,7 +190,6 @@ async def demo_login():
     
     # If demo user doesn't exist, create it
     if not user:
-        from datetime import datetime
         user_dict = {
             "email": demo_email,
             "name": demo_name,
@@ -170,6 +200,9 @@ async def demo_login():
         }
         result = await db.users.insert_one(user_dict)
         user = await db.users.find_one({"_id": result.inserted_id})
+        
+        # Create default labels for demo user
+        await create_default_labels(db, user["_id"])
     
     # Convert ObjectId to string for response
     user["_id"] = str(user["_id"])

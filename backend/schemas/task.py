@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional, List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from models.task import Priority, TaskStatus
 
 
@@ -36,11 +36,13 @@ class TaskResponse(TaskBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        populate_by_name = True
-        json_schema_extra = {
+    # Use Pydantic v2 ConfigDict for proper configuration
+    model_config = ConfigDict(
+        populate_by_name=True,  # Allow _id as input alias
+        from_attributes=True,   # Allow ORM mode
+        json_schema_extra={
             "example": {
-                "_id": "507f1f77bcf86cd799439011",
+                "id": "507f1f77bcf86cd799439011",
                 "user_id": "507f1f77bcf86cd799439012",
                 "title": "Complete project documentation",
                 "description": "Write comprehensive README and API docs",
@@ -52,6 +54,7 @@ class TaskResponse(TaskBase):
                 "updated_at": "2025-10-10T12:00:00"
             }
         }
+    )
 
 
 class TaskListResponse(BaseModel):
