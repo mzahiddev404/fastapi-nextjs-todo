@@ -11,7 +11,7 @@ from core.security import (
     create_access_token,
     get_current_active_user
 )
-from schemas.user import UserCreate, UserResponse, UserLogin, Token, AuthResponse
+from schemas.user import UserCreate, UserResponse, UserLogin, UserUpdate, Token, AuthResponse
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -232,3 +232,60 @@ async def refresh_token(current_user: dict = Depends(get_current_active_user)):
     )
     
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.put("/profile", response_model=UserResponse)
+async def update_profile(
+    user_data: UserUpdate,
+    current_user: dict = Depends(get_current_active_user)
+):
+    """
+    Update current user's profile information.
+    Only name and email can be updated.
+    """
+    db = await get_database()
+    
+    # Build update data - only include fields that are provided
+    update_data = {}
+    if user_data.name is not None:
+        update_data["name"] = user_data.name
+    if user_data.email is not None:
+        # Check if email is already taken by another user
+        existing_user = await db.users.find_one({
+            "email": user_data.email,
+            "_id": {"$ne": ObjectId(current_user["_id"])}
+        })
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered"
+            )
+        update_data["email"] = user_data.email
+    
+    # Nothing to update
+    if not update_data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No update data provided"
+        )
+    
+    # Add updated timestamp
+    update_data["updated_at"] = datetime.utcnow()
+    
+    # Update user in database
+    result = await db.users.find_one_and_update(
+        {"_id": ObjectId(current_user["_id"])},
+        {"$set": update_data},
+        return_document=True
+    )
+    
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Add id field for response
+    result["id"] = str(result["_id"])
+    
+    return result

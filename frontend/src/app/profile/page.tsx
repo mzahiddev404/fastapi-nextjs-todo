@@ -9,15 +9,16 @@ import { useTasks } from "@/hooks/useTasks";
 // User profile page
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, isLoading: authLoading, error: authError, isAuthenticated } = useAuth();
+  const { user, isLoading: authLoading, error: authError, isAuthenticated, updateProfile } = useAuth();
   const { tasks, isLoading: tasksLoading } = useTasks();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    username: user?.username || "",
+    name: user?.name || "",
     email: user?.email || "",
   });
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   // Redirect to login if not authenticated
   if (!authLoading && !isAuthenticated) {
@@ -58,12 +59,14 @@ export default function ProfilePage() {
     e.preventDefault();
     setIsSaving(true);
     setSaveError("");
+    setSuccessMessage("");
 
     try {
-      // TODO: Implement profile update API call
-      // await updateProfile(formData);
-      console.log("Profile update not implemented yet:", formData);
+      await updateProfile(formData.name, formData.email);
+      setSuccessMessage("Profile updated successfully!");
       setIsEditing(false);
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : "Failed to update profile");
     } finally {
@@ -139,6 +142,12 @@ export default function ProfilePage() {
               </div>
 
               <div className="px-6 py-4">
+                {successMessage && (
+                  <Alert variant="success" className="mb-4">
+                    {successMessage}
+                  </Alert>
+                )}
+                
                 {isEditing ? (
                   <form onSubmit={handleSubmit} className="space-y-4">
                     {saveError && (
@@ -148,16 +157,16 @@ export default function ProfilePage() {
                     )}
                     
                     <div>
-                      <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                        Username
+                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                        Name
                       </label>
                       <Input
-                        id="username"
-                        name="username"
+                        id="name"
+                        name="name"
                         type="text"
-                        value={formData.username}
+                        value={formData.name}
                         onChange={handleChange}
-                        required
+                        placeholder="Your name"
                       />
                     </div>
 
@@ -178,7 +187,6 @@ export default function ProfilePage() {
                     <div className="flex items-center space-x-3">
                       <Button
                         type="submit"
-                        
                         disabled={isSaving}
                       >
                         {isSaving ? "Saving..." : "Save Changes"}
@@ -189,7 +197,7 @@ export default function ProfilePage() {
                         onClick={() => {
                           setIsEditing(false);
                           setFormData({
-                            username: user?.username || "",
+                            name: user?.name || "",
                             email: user?.email || "",
                           });
                           setSaveError("");
@@ -203,9 +211,9 @@ export default function ProfilePage() {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Username
+                        Name
                       </label>
-                      <p className="text-sm text-gray-900">{user?.username || "N/A"}</p>
+                      <p className="text-sm text-gray-900">{user?.name || "Not set"}</p>
                     </div>
 
                     <div>

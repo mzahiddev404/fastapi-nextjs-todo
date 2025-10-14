@@ -72,6 +72,17 @@ export function useAuth() {
     }
   };
 
+  // Update profile function
+  const updateProfile = async (name?: string, email?: string) => {
+    try {
+      const response = await api.put("/api/v1/auth/profile", { name, email });
+      mutate(); // Revalidate user data to reflect changes
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   // Logout function
   const logout = () => {
     // Remove token from localStorage
@@ -91,6 +102,7 @@ export function useAuth() {
     signup,
     startDemo,
     logout,
+    updateProfile,
     mutate,
   };
 }
