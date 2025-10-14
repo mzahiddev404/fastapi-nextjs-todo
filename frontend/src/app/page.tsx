@@ -23,13 +23,17 @@ export default function Home() {
 
   // Redirect to login if not authenticated
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
+    // Only redirect if we're done loading AND there's no user AND no token
+    const hasToken = typeof window !== 'undefined' && localStorage.getItem('todo_token');
+    if (!authLoading && !isAuthenticated && !hasToken) {
       router.push("/auth/login");
     }
   }, [authLoading, isAuthenticated, router]);
 
   // Show loading while checking authentication
-  if (authLoading) {
+  const hasToken = typeof window !== 'undefined' && localStorage.getItem('todo_token');
+  
+  if (authLoading || (hasToken && !user && !authError)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -40,8 +44,8 @@ export default function Home() {
     );
   }
 
-  // Don't render anything while redirecting
-  if (!isAuthenticated) {
+  // Don't render anything while redirecting (only if no token and not authenticated)
+  if (!isAuthenticated && !hasToken) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
