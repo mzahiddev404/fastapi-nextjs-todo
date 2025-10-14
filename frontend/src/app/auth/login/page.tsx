@@ -13,7 +13,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-  const { login, startDemo } = useAuth();
+  const { login } = useAuth();
 
   // Handle user login submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,23 +29,6 @@ export default function LoginPage() {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Login failed. Please try again.";
       setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Handle demo account login
-  const handleDemo = async () => {
-    setIsLoading(true);
-    setError("");
-
-    try {
-      await startDemo();
-      // Small delay to ensure token is stored in localStorage before redirect
-      await new Promise(resolve => setTimeout(resolve, 100));
-      router.push("/");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Demo failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -209,48 +192,13 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="space-y-6">
-            <div className="relative py-4">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t-2 border-gray-300" />
-              </div>
-              <div className="relative flex justify-center">
-                <span className="px-6 py-2 bg-white text-sm font-bold text-gray-600 uppercase tracking-wider rounded-full shadow-sm">OR</span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleDemo}
-              disabled={isLoading}
-              className="w-full py-4 px-6 text-base font-semibold bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-900 rounded-xl border-2 border-gray-300 hover:border-gray-400 shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-gray-300/50 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Starting demo...
-                </span>
-              ) : (
-                <span className="flex items-center justify-center">
-                  <svg className="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  Try Demo Account
-                </span>
-              )}
-            </button>
-
-            <div className="text-center pt-4">
-              <p className="text-base text-gray-600">
-                Don't have an account?{" "}
-                <Link href="/auth/signup" className="font-bold text-blue-600 hover:text-blue-700 hover:underline transition-colors">
-                  Sign up
-                </Link>
-              </p>
-            </div>
+          <div className="text-center pt-6">
+            <p className="text-base text-gray-600">
+              Don't have an account?{" "}
+              <Link href="/auth/signup" className="font-bold text-blue-600 hover:text-blue-700 hover:underline transition-colors">
+                Sign up
+              </Link>
+            </p>
           </div>
         </div>
       </div>

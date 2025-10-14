@@ -60,18 +60,6 @@ export function useAuth() {
     }
   };
 
-  // Demo function
-  const startDemo = async () => {
-    try {
-      const response = await api.post("/api/v1/auth/demo", {});
-      // Token is automatically stored by the API client
-      mutate(); // Revalidate user data
-      return response;
-    } catch (error) {
-      throw error;
-    }
-  };
-
   // Update profile function
   const updateProfile = async (name?: string, email?: string) => {
     try {
@@ -110,10 +98,8 @@ export function useAuth() {
     isLoading,
     error,
     isAuthenticated: !!user && !error,
-    isDemo: user?.is_demo || false,
     login,
     signup,
-    startDemo,
     logout,
     updateProfile,
     changePassword,

@@ -11,7 +11,6 @@ import { TaskList } from "@/components/TaskList";
 import { UserInfo } from "@/components/UserInfo";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { DashboardSkeleton } from "@/components/skeletons";
-import { DemoBanner } from "@/components/DemoBanner";
 import { Task } from "@/types";
 
 // Main dashboard page - protected route that shows user info and task list
@@ -166,9 +165,6 @@ export default function Home() {
         <div className="absolute bottom-20 left-1/3 w-36 h-36 bg-cyan-400/30 rounded-full blur-2xl animate-bounce" style={{ animationDuration: '5s', animationDelay: '2s' }}></div>
         <div className="absolute bottom-1/4 right-1/4 w-28 h-28 bg-purple-400/30 rounded-full blur-2xl animate-bounce" style={{ animationDuration: '6s', animationDelay: '0.5s' }}></div>
       </div>
-
-      {/* Demo Banner */}
-      <DemoBanner />
       
       {/* Header with user info and logout */}
       {user && <DashboardHeader user={user} onLogout={handleLogout} />}
