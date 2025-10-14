@@ -20,20 +20,27 @@ export default function Home() {
   const { tasks, isLoading: tasksLoading, error: tasksError, updateTaskStatus, deleteTask } = useTasks();
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const [hasToken, setHasToken] = useState(false);
+
+  // Check if component is mounted and if token exists (client-side only)
+  useEffect(() => {
+    setIsMounted(true);
+    if (typeof window !== 'undefined') {
+      setHasToken(!!localStorage.getItem('todo_token'));
+    }
+  }, []);
 
   // Redirect to login if not authenticated
   useEffect(() => {
     // Only redirect if we're done loading AND there's no user AND no token
-    const hasToken = typeof window !== 'undefined' && localStorage.getItem('todo_token');
-    if (!authLoading && !isAuthenticated && !hasToken) {
+    if (isMounted && !authLoading && !isAuthenticated && !hasToken) {
       router.push("/auth/login");
     }
-  }, [authLoading, isAuthenticated, router]);
+  }, [isMounted, authLoading, isAuthenticated, hasToken, router]);
 
-  // Show loading while checking authentication
-  const hasToken = typeof window !== 'undefined' && localStorage.getItem('todo_token');
-  
-  if (authLoading || (hasToken && !user && !authError)) {
+  // Show loading while checking authentication or during SSR
+  if (!isMounted || authLoading || (hasToken && !user && !authError)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -49,7 +56,7 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <LoadingSpinner size="lg" text="Redirecting to login..." />
+          <LoadingSpinner size="lg" text="Loading..." />
           <p className="mt-4 text-gray-600">Please sign in to continue</p>
         </div>
       </div>
