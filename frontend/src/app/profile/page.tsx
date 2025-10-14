@@ -238,23 +238,23 @@ export default function ProfilePage() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50/30 to-purple-50/30">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white/90 backdrop-blur-sm shadow-lg border-b-2 border-indigo-100">
         <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button
                 variant="secondary"
                 onClick={() => router.push("/")}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white border-0"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 <span>Back to Dashboard</span>
               </Button>
-              <h1 className="text-xl font-semibold text-gray-900">Profile</h1>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">My Profile</h1>
             </div>
           </div>
         </div>
@@ -265,14 +265,20 @@ export default function ProfilePage() {
         <div className="px-4 py-6 sm:px-0">
           <div className="space-y-6">
             {/* Profile Information */}
-            <div className="bg-white shadow rounded-lg">
-              <div className="px-6 py-4 border-b border-gray-200">
+            <div className="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl border-2 border-indigo-100 overflow-hidden">
+              <div className="px-6 py-4 border-b-2 border-indigo-100 bg-gradient-to-r from-indigo-50 to-purple-50">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-medium text-gray-900">Profile Information</h2>
+                  <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Profile Information
+                  </h2>
                   <Button
                     onClick={() => setIsEditing(!isEditing)}
                     variant="secondary"
                     size="sm"
+                    className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white border-0"
                   >
                     {isEditing ? "Cancel" : "Edit"}
                   </Button>
@@ -382,10 +388,15 @@ export default function ProfilePage() {
             </div>
 
             {/* Change Password */}
-            <div className="bg-white shadow rounded-lg">
-              <div className="px-6 py-4 border-b border-gray-200">
+            <div className="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl border-2 border-purple-100 overflow-hidden">
+              <div className="px-6 py-4 border-b-2 border-purple-100 bg-gradient-to-r from-purple-50 to-pink-50">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-medium text-gray-900">Change Password</h2>
+                  <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    Change Password
+                  </h2>
                   {!isChangingPassword && (
                     <Button
                       onClick={() => {
@@ -395,6 +406,7 @@ export default function ProfilePage() {
                       }}
                       variant="secondary"
                       size="sm"
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-0"
                     >
                       Change Password
                     </Button>
@@ -485,42 +497,47 @@ export default function ProfilePage() {
             </div>
 
             {/* Task Statistics */}
-            <div className="bg-white shadow rounded-lg">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-medium text-gray-900">Task Statistics</h2>
+            <div className="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl border-2 border-pink-100 overflow-hidden">
+              <div className="px-6 py-4 border-b-2 border-pink-100 bg-gradient-to-r from-pink-50 to-purple-50">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  Task Statistics
+                </h2>
               </div>
 
               <div className="px-6 py-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-900">{taskStats.total}</div>
-                    <div className="text-sm text-gray-500">Total Tasks</div>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="text-center bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-100">
+                    <div className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{taskStats.total}</div>
+                    <div className="text-sm font-semibold text-gray-700 mt-1">Total Tasks</div>
                   </div>
                   
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">{taskStats.completed}</div>
-                    <div className="text-sm text-gray-500">Completed</div>
+                  <div className="text-center bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-100">
+                    <div className="text-3xl font-extrabold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{taskStats.completed}</div>
+                    <div className="text-sm font-semibold text-gray-700 mt-1">Completed</div>
                   </div>
                   
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-yellow-600">{taskStats.pending}</div>
-                    <div className="text-sm text-gray-500">Pending</div>
+                  <div className="text-center bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl p-4 border-2 border-yellow-100">
+                    <div className="text-3xl font-extrabold bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent">{taskStats.pending}</div>
+                    <div className="text-sm font-semibold text-gray-700 mt-1">Pending</div>
                   </div>
                   
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-red-600">{taskStats.overdue}</div>
-                    <div className="text-sm text-gray-500">Overdue</div>
+                  <div className="text-center bg-gradient-to-br from-red-50 to-pink-50 rounded-xl p-4 border-2 border-red-100">
+                    <div className="text-3xl font-extrabold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">{taskStats.overdue}</div>
+                    <div className="text-sm font-semibold text-gray-700 mt-1">Overdue</div>
                   </div>
                 </div>
 
                 <div className="mt-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">Completion Rate</span>
-                    <span className="text-sm text-gray-500">{completionRate}%</span>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-bold text-gray-900">Completion Rate</span>
+                    <span className="text-sm font-extrabold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{completionRate}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
                     <div
-                      className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full transition-all duration-500"
                       style={{ width: `${completionRate}%` }}
                     ></div>
                   </div>
@@ -529,42 +546,55 @@ export default function ProfilePage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-white shadow rounded-lg">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-medium text-gray-900">Quick Actions</h2>
+            <div className="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl border-2 border-indigo-100 overflow-hidden">
+              <div className="px-6 py-4 border-b-2 border-indigo-100 bg-gradient-to-r from-indigo-50 to-cyan-50">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Quick Actions
+                </h2>
               </div>
 
               <div className="px-6 py-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Button
                     onClick={() => router.push("/")}
-                    
-                    className="w-full"
+                    className="w-full bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 font-semibold h-12"
                   >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
                     View All Tasks
                   </Button>
                   
                   <Button
                     onClick={() => router.push("/tasks/status/pending")}
-                    variant="secondary"
-                    className="w-full"
+                    className="w-full bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 font-semibold h-12"
                   >
-                    View Pending Tasks
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    View Pending
                   </Button>
                   
                   <Button
                     onClick={() => router.push("/tasks/status/completed")}
-                    variant="secondary"
-                    className="w-full"
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 font-semibold h-12"
                   >
-                    View Completed Tasks
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    View Completed
                   </Button>
                   
                   <Button
                     onClick={() => router.push("/")}
-                    variant="secondary"
-                    className="w-full"
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 font-semibold h-12"
                   >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
                     Create New Task
                   </Button>
                 </div>
