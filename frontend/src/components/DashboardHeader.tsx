@@ -43,18 +43,10 @@ export function DashboardHeader({ user, onLogout }: DashboardHeaderProps) {
           
           {/* User Info and Actions Section */}
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-            {/* User avatar and info - only show on larger screens */}
-            <div className="hidden xl:flex items-center gap-2 sm:gap-3 bg-white/80 backdrop-blur-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl shadow-lg border border-indigo-100 flex-shrink-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg text-sm sm:text-base flex-shrink-0">
-                {(user?.name || user?.email || "U").charAt(0).toUpperCase()}
-              </div>
-              <div className="text-right overflow-hidden">
-                <p className="text-xs sm:text-sm font-bold text-gray-900 truncate max-w-[120px]">
-                  {user?.name || user?.email || "User"}
-                </p>
-                <p className="text-[10px] sm:text-xs font-medium text-indigo-600 whitespace-nowrap">Welcome back! 👋</p>
-              </div>
-            </div>
+            {/* Welcome message - show on medium screens and up */}
+            <p className="hidden md:block text-xs sm:text-sm font-medium text-indigo-600 whitespace-nowrap">
+              Welcome back! 👋
+            </p>
             
             {/* Action Buttons */}
             <div className="flex items-center gap-1.5 sm:gap-2">
