@@ -21,11 +21,17 @@ export default function LoginPage() {
     setError("");
 
     try {
-      await login(email, password);
+      console.log("Attempting login with:", email);
+      const result = await login(email, password);
+      console.log("Login successful:", result);
+      // Small delay to ensure token is stored before redirect
+      await new Promise(resolve => setTimeout(resolve, 100));
       router.push("/");
     } catch (err) {
       console.error("Login error:", err);
-      setError(err instanceof Error ? err.message : "Login failed. Please try again.");
+      const errorMessage = err instanceof Error ? err.message : "Login failed. Please try again.";
+      console.error("Error message:", errorMessage);
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -37,6 +43,8 @@ export default function LoginPage() {
 
     try {
       await startDemo();
+      // Small delay to ensure token is stored before redirect
+      await new Promise(resolve => setTimeout(resolve, 100));
       router.push("/");
     } catch (err) {
       console.error("Demo error:", err);
