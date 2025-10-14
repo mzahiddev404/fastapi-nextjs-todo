@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button, LoadingSpinner, Alert } from "@/components/ui";
 import { useAuth } from "@/hooks/useAuth";
 import { useTasks } from "@/hooks/useTasks";
+import { useLabels } from "@/hooks/useLabels";
 import { TaskForm } from "@/components/TaskForm";
 import { TaskList } from "@/components/TaskList";
 import { UserInfo } from "@/components/UserInfo";
@@ -18,10 +19,12 @@ export default function Home() {
   const router = useRouter();
   const { user, isLoading: authLoading, error: authError, isAuthenticated, logout } = useAuth();
   const { tasks, isLoading: tasksLoading, error: tasksError, updateTaskStatus, deleteTask } = useTasks();
+  const { labels } = useLabels();
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [hasToken, setHasToken] = useState(false);
+  const [selectedLabelFilter, setSelectedLabelFilter] = useState<string | null>(null);
 
   // Check if component is mounted and if token exists (client-side only)
   useEffect(() => {
@@ -38,6 +41,19 @@ export default function Home() {
       router.push("/auth/login");
     }
   }, [isMounted, authLoading, isAuthenticated, hasToken, router]);
+
+  // Filter tasks based on selected label (must be called before any conditional returns)
+  const filteredTasks = useMemo(() => {
+    if (!selectedLabelFilter) {
+      return tasks;
+    }
+    return tasks.filter(task => task.labels && task.labels.includes(selectedLabelFilter));
+  }, [tasks, selectedLabelFilter]);
+
+  // Get label details by ID
+  const getLabelById = (labelId: string) => {
+    return labels.find(label => label.id === labelId);
+  };
 
   // Show loading while checking authentication or during SSR
   if (!isMounted || authLoading || (hasToken && !user && !authError)) {
@@ -191,9 +207,73 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Label Filters */}
+              {labels.length > 0 && (
+                <div className="mb-6">
+                  <div className="bg-white/80 backdrop-blur-sm shadow-lg shadow-indigo-100/50 rounded-2xl p-5 border border-indigo-100/50">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                        <h3 className="text-base font-semibold text-gray-900">Filter by Label</h3>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <button
+                          onClick={() => setSelectedLabelFilter(null)}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                            selectedLabelFilter === null
+                              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          All Tasks
+                          <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs bg-white/20">
+                            {tasks.length}
+                          </span>
+                        </button>
+                        {labels.map((label) => (
+                          <button
+                            key={label.id}
+                            onClick={() => setSelectedLabelFilter(label.id)}
+                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                              selectedLabelFilter === label.id
+                                ? 'shadow-lg scale-105'
+                                : 'hover:scale-105 shadow-sm'
+                            }`}
+                            style={{
+                              backgroundColor: selectedLabelFilter === label.id ? label.color : `${label.color}20`,
+                              color: selectedLabelFilter === label.id ? '#fff' : label.color,
+                              borderWidth: '2px',
+                              borderColor: label.color,
+                            }}
+                          >
+                            <span className="w-2 h-2 rounded-full inline-block mr-2" style={{ backgroundColor: selectedLabelFilter === label.id ? '#fff' : label.color }}></span>
+                            {label.name}
+                            <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs" style={{ backgroundColor: selectedLabelFilter === label.id ? 'rgba(255,255,255,0.3)' : `${label.color}30` }}>
+                              {tasks.filter(t => t.labels && t.labels.includes(label.id)).length}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    {selectedLabelFilter && (
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <p className="text-sm text-gray-600">
+                          Showing <span className="font-semibold text-gray-900">{filteredTasks.length}</span> task{filteredTasks.length !== 1 ? 's' : ''} with label{' '}
+                          <span className="font-semibold" style={{ color: getLabelById(selectedLabelFilter)?.color }}>
+                            {getLabelById(selectedLabelFilter)?.name}
+                          </span>
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
           {/* Task List */}
           <TaskList
-            tasks={tasks}
+            tasks={filteredTasks}
             onEditTask={handleEditTask}
             onToggleTaskStatus={handleToggleTaskStatus}
             onDeleteTask={handleDeleteTask}
