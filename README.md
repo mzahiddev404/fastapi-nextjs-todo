@@ -6,9 +6,6 @@ A production-ready task management application built with FastAPI and Next.js, f
 
 ## 📚 Documentation
 
-- **[Complete Guide](./STAGES_COMPLETE.md)** - Detailed stage-by-stage implementation
-- **[Refactoring Summary](./REFACTORING_SUMMARY.md)** - Code improvements and optimizations
-
 ## 🚀 Tech Stack
 
 **Backend:**
